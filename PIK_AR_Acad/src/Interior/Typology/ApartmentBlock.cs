@@ -63,6 +63,10 @@ namespace PIK_AR_Acad.Interior.Typology
                         }
                         apartments.Add(apartment);
                     }
+                    else
+                    {
+                        Inspector.AddError($"Пропущен блок '{blName}'", blRef, System.Drawing.SystemIcons.Warning);
+                    }
                 }
                 t.Commit();
             }
