@@ -71,6 +71,7 @@
     <Compile Include="src\Interior\Typology\ApartmentBlock.cs" />
     <Compile Include="src\Interior\Typology\ApartmentType.cs" />
     <Compile Include="src\Interior\Typology\ApartmentTypology.cs" />
+    <Compile Include="src\Interior\Typology\Options.cs" />
     <Compile Include="src\Interior\Typology\TopologyTable.cs" />
     <Compile Include="src\LayoutSort\LayoutSortService.cs" />
     <Compile Include="src\LayoutSort\Sheet.cs" />

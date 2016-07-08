@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Geometry;
 
 namespace PIK_AR_Acad.Interior.Typology
 {
@@ -37,11 +38,17 @@ namespace PIK_AR_Acad.Interior.Typology
 
             // группировка квартир по типам
             var groupApartments = apartments.GroupBy(g=>g).OrderBy(o=>o.Key.Type).ThenBy(o=>o.Key).ToList();
-
-            TopologyTable tableService = new TopologyTable (groupApartments, Db);
-            tableService.CalcRows();
-            var table = tableService.Create();
-            tableService.Insert(table, Doc);
+            
+            using (var t = Db.TransactionManager.StartTransaction())
+            {
+                TopologyTable tableService = new TopologyTable (groupApartments, Db);
+                tableService.CalcRows();
+                var table = tableService.Create();
+                var scale = AcadLib.Scale.ScaleHelper.GetCurrentAnnoScale(Db);
+                table.TransformBy(Matrix3d.Scaling(scale, table.Position));
+                tableService.Insert(table.Id, Doc);
+                t.Commit();
+            }            
         }
     }
 }
