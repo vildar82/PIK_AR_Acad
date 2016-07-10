@@ -13,18 +13,20 @@ namespace PIK_AR_Acad.Interior.Typology
     public class TopologyTable : AcadLib.Tables.CreateTable
     {        
         private List<IGrouping<ApartmentBlock, ApartmentBlock>> apartments;
-        
-        public TopologyTable (List<IGrouping<ApartmentBlock, ApartmentBlock>> apartments, Database db) : base(db)
+        SchemeBlock scheme;
+
+        public TopologyTable (List<IGrouping<ApartmentBlock, ApartmentBlock>> apartments, SchemeBlock scheme, Database db) : base(db)
         {
             this.apartments = apartments;
-            LwBold = LineWeight.ByLayer;         
+            LwBold = LineWeight.ByLayer;
+            this.scheme = scheme; 
         }
 
         public override void CalcRows ()
         {
             NumColumns = 6;
             NumRows = apartments.Count + 3;
-            Title = "Типология квартир " + DateTime.Now;            
+            Title = $"Типология квартир - {scheme?.Name} : {DateTime.Now}";
         }        
 
         protected override void SetColumnsAndCap (ColumnsCollection columns)
@@ -83,7 +85,7 @@ namespace PIK_AR_Acad.Interior.Typology
             table.Cells[0, 0].TextHeight = 7;
             table.LineWeight = LineWeight.ByLayer;
 
-            var groupApartments = apartments.GroupBy(g=>g.Key.Type);            
+            var groupApartments = apartments.GroupBy(g=>g.Key.Type).OrderBy(o=>o.Key);            
 
             foreach (var group in groupApartments)
             {
@@ -106,23 +108,17 @@ namespace PIK_AR_Acad.Interior.Typology
                     cell.TextString = count++.ToString();
 
                     cell = table.Cells[row, 1];
-                    cell.TextString = apart.Key.NameChronology;
-
-                    //cell = table.Cells[row, 1];
-                    //cell.TextString = group.Key.Type.Names;
-                    //cell.BackgroundColor = group.Key.Type.Color;
+                    cell.TextString = apart.Key.NameChronology;                   
 
                     cell = table.Cells[row, 3];
                     cell.TextString = apart.Key.Name;                    
 
-                    cell = table.Cells[row, 4];
-                    //cell.Borders.Vertical.Margin = 4;
+                    cell = table.Cells[row, 4];                    
                     cell.BlockTableRecordId = apart.Key.IdBtr;
                     var blockContent = cell.Contents[0];
                     blockContent.IsAutoScale = false;
                     blockContent.Scale = (1 / scale) * 0.4;
-                    blockContent.ContentColor = group.Key.Color;                    
-                    cell.Borders.Vertical.Margin = 4;
+                    blockContent.ContentColor = group.Key.Color;                                        
 
                     cell = table.Cells[row, 5];
                     cell.TextString = apart.Count().ToString();
@@ -140,9 +136,7 @@ namespace PIK_AR_Acad.Interior.Typology
             cell = table.Cells[row, 0];
             cell.TextString = "Итого";
             cell = table.Cells[row, 5];
-            cell.TextString = apartments.Sum(s=>s.Count()).ToString();
-
-            //table.Columns[2].Width = 24;            
+            cell.TextString = apartments.Sum(s=>s.Count()).ToString();            
         }
 
         public void Insert (ObjectId idTable, Document doc)

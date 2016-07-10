@@ -7,6 +7,8 @@ using AcadLib.Blocks;
 using AcadLib.Errors;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
+using AcadLib.Geometry;
+using Autodesk.AutoCAD.Geometry;
 
 namespace PIK_AR_Acad.Interior.Typology
 {
@@ -42,9 +44,13 @@ namespace PIK_AR_Acad.Interior.Typology
         public ApartmentType Type { get; set; }
         public string Name { get; set; }
         public string NameChronology { get; set;} 
+        public Point3d Center { get; set; }
+        public Section Section { get; set; }
+        public SchemeBlock Scheme { get; set; }
 
         public ApartmentBlock (BlockReference blRef, string blName) : base(blRef, blName)
         {
+            Center = Bounds.Value.Center();
             NameChronology = GetNameChronology(blName);
             Color = GetColor(blRef);        
             Name = blName;
@@ -61,8 +67,9 @@ namespace PIK_AR_Acad.Interior.Typology
             return layer.Color;
         }
 
-        public static List<ApartmentBlock> GetApartments (List<ObjectId> sel)
+        public static List<ApartmentBlock> GetApartments (List<ObjectId> sel, out SchemeBlock scheme)
         {
+            scheme = null;
             if (!sel.Any()) return null;
 
             var apartments = new List<ApartmentBlock>();
@@ -87,14 +94,73 @@ namespace PIK_AR_Acad.Interior.Typology
                         }
                         apartments.Add(apartment);
                     }
+                    else if (SchemeBlock.IsSchemeBlock(blName))
+                    {
+                        scheme = new SchemeBlock(blRef, blName);
+                    }
                     else
                     {
                         Inspector.AddError($"Пропущен блок '{blName}'", blRef, System.Drawing.SystemIcons.Warning);
                     }
                 }
+
+                // Определение секции для каждой квартиры                
+                defineSections(apartments,ref scheme);                
+
                 t.Commit();
             }
             return apartments;
+        }
+
+        private static void defineSections (List<ApartmentBlock> apartments,ref SchemeBlock scheme)
+        {
+            var secNull = new Section(null, ObjectId.Null);
+            secNull.Name = "Неопределенная";
+
+            if (scheme == null)
+            {
+                Inspector.AddError($"Не определен блок схемы", System.Drawing.SystemIcons.Error);
+
+                scheme = new SchemeBlock(null, null);                
+            }
+            else if (scheme.Sections.Count == 0)
+            {
+                Inspector.AddError($"Не определены секции в схеме", scheme.IdBlRef, System.Drawing.SystemIcons.Error);                
+            }
+
+            foreach (var apart in apartments)
+            {
+                foreach (var sec in scheme.Sections)
+                {
+                    if (sec.Contour.IsPointInsidePolygon(apart.Center))
+                    {
+                        apart.Section = sec;
+                        apart.Scheme = scheme;
+                        break;
+                    }
+                }
+                if (apart.Section == null)
+                {
+                    apart.Section = secNull;
+                }
+            }
+
+            CheckSecNull(apartments, scheme, secNull);
+        }
+
+        private static void CheckSecNull (List<ApartmentBlock> apartments, SchemeBlock scheme, Section secNull)
+        {
+            if (apartments.Any(a => a.Section == secNull))
+            {
+                scheme.Sections.Add(secNull);
+                var apartsSecNull = apartments.Where(s => s.Section == secNull);
+                Extents3d extSecNull = new Extents3d();
+                foreach (var item in apartsSecNull)
+                {
+                    extSecNull.AddExtents(item.Bounds.Value);
+                }                
+                Inspector.AddError($"Неопределенная секция", extSecNull, Matrix3d.Identity, System.Drawing.SystemIcons.Error);
+            }
         }
 
         public static bool IsApartmentBlock (string blName)

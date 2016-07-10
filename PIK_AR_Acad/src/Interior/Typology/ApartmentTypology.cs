@@ -33,7 +33,8 @@ namespace PIK_AR_Acad.Interior.Typology
             Ed.WriteMessage($"\nВыбрано блоков - {sel.Count}");
 
             // Определение квартир
-            var apartments = ApartmentBlock.GetApartments (sel);
+            SchemeBlock scheme;
+            var apartments = ApartmentBlock.GetApartments (sel, out scheme);
             Ed.WriteMessage($"\nОпределено блков квартир - {apartments.Count}");
 
             // группировка квартир по типам
@@ -41,14 +42,26 @@ namespace PIK_AR_Acad.Interior.Typology
             
             using (var t = Db.TransactionManager.StartTransaction())
             {
-                TopologyTable tableService = new TopologyTable (groupApartments, Db);
+                TopologyTable tableService = new TopologyTable (groupApartments, scheme, Db);
                 tableService.CalcRows();
                 var table = tableService.Create();
                 var scale = AcadLib.Scale.ScaleHelper.GetCurrentAnnoScale(Db);
                 table.TransformBy(Matrix3d.Scaling(scale, table.Position));
-                tableService.Insert(table.Id, Doc);
+
+                TopologyTableSetions tableServiceSections = new TopologyTableSetions(groupApartments, scheme, Db);
+                tableServiceSections.CalcRows();
+                var tableSec = tableServiceSections.Create();
+                tableSec.Position = new Point3d(table.Position.X, table.Position.Y-table.Height- 10*scale,0);
+                tableSec.TransformBy(Matrix3d.Scaling(scale, tableSec.Position));
+
+                ObjectId[] ids = new ObjectId[2];
+                ids[0] = table.Id;
+                ids[1] = tableSec.Id;
+
+                AcadLib.Jigs.DragSel.Drag(Doc.Editor, ids.ToArray(), Point3d.Origin);
+
                 t.Commit();
             }            
-        }
+        }       
     }
 }
