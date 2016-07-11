@@ -182,7 +182,39 @@ namespace PIK_AR_Acad.Interior.Typology
 
                     curCol++;                        
                 }
+
+                // Объединение одинаковых хронологических марок
+                MergeChronoCells(table);
             }
-        }        
+        }
+
+        private void MergeChronoCells (Table table)
+        {
+            string lastChrono = null;
+            int lastIndex = 0;
+            for (int i = 2; i < table.Columns.Count-2; i++)
+            {
+                var cell = table.Cells[rowMarkChrono, i];
+                
+                if (lastChrono != cell.TextString)
+                {   
+                    if (lastChrono != null)
+                    {
+                        var mCells = CellRange.Create(table, rowMarkChrono, lastIndex, rowMarkChrono, i-1);
+                        table.MergeCells(mCells);
+                    }
+                    if (cell.TextString == "-" || string.IsNullOrWhiteSpace(cell.TextString))
+                    {
+                        lastIndex = 0;
+                        lastChrono = null;                        
+                    }
+                    else
+                    {
+                        lastChrono = cell.TextString;
+                        lastIndex = i;
+                    }
+                }
+            }
+        }
     }
 }
