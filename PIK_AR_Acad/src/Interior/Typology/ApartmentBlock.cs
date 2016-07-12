@@ -174,7 +174,7 @@ namespace PIK_AR_Acad.Interior.Typology
         {
             string chrono;
             if (!Options.Instance.ApartmentsChronology.TryGetValue(blName, out chrono))            
-                chrono = string.Empty;
+                chrono = "-";
             return chrono;            
         }
 

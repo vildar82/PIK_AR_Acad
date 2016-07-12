@@ -125,6 +125,9 @@ namespace PIK_AR_Acad.Interior.Typology
 
                     row++;
                 }
+
+                // Объединение одинаковых хронологических марок
+                MergeChronoCells(table);
             }
 
             table.Columns[4].Borders.Bottom.Margin = 4;
@@ -137,6 +140,35 @@ namespace PIK_AR_Acad.Interior.Typology
             cell.TextString = "Итого";
             cell = table.Cells[row, 5];
             cell.TextString = apartments.Sum(s=>s.Count()).ToString();            
+        }
+
+        private void MergeChronoCells (Table table)
+        {
+            string lastChrono = null;
+            int lastIndex = 0;
+            for (int i = 2; i < table.Rows.Count - 2; i++)
+            {
+                var cell = table.Cells[i, 1];
+
+                if (lastChrono != cell.TextString)
+                {
+                    if (lastChrono != null)
+                    {
+                        var mCells = CellRange.Create(table, lastIndex, 1, i - 1, 1);
+                        table.MergeCells(mCells);
+                    }
+                    if (cell.TextString == "-" || string.IsNullOrWhiteSpace(cell.TextString))
+                    {
+                        lastIndex = 0;
+                        lastChrono = null;
+                    }
+                    else
+                    {
+                        lastChrono = cell.TextString;
+                        lastIndex = i;
+                    }
+                }
+            }
         }
 
         public void Insert (ObjectId idTable, Document doc)
