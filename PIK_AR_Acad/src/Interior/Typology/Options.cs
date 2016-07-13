@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using AcadLib;
 using Autodesk.AutoCAD.ApplicationServices;
 
@@ -16,11 +17,12 @@ namespace PIK_AR_Acad.Interior.Typology
         static string FileXml = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\Interior\AI_ApartmentsTypology.xml");
         const string DictNod = "AI_ApartmentsTypology";
         //const string RecAbsoluteZero = "AbsoluteZero";        
-
-        [Category("Общие")]
-        [DisplayName("Хронологические марки квартир")]
-        [Description("Имена квартир новые (PIK) и соответствующие им хронологические имена (старые).")]        
-        public AcadLib.UI.Properties.XmlSerializableDictionary<string> ApartmentsChronology { get; set; }
+        
+        //[Category("Общие")]
+        //[DisplayName("Хронологические марки квартир")]
+        //[Description("Имена квартир новые (PIK) и соответствующие им хронологические имена (старые).")]        
+        //[XmlIgnore]
+        //public AcadLib.UI.Properties.XmlSerializableDictionary<string> ApartmentsChronology { get; set; }        
 
         private static Options _instance;
         public static Options Instance {
@@ -64,7 +66,7 @@ namespace PIK_AR_Acad.Interior.Typology
                 try
                 {
                     // Загрузка настроек таблицы из файла XML
-                    options = Options.LoadFromXml();
+                    //options = Options.LoadFromXml();
                 }
                 catch (Exception ex)
                 {
@@ -79,7 +81,7 @@ namespace PIK_AR_Acad.Interior.Typology
                 // Сохранение дефолтных настроек 
                 try
                 {
-                    options.Save();
+                    //options.Save();
                 }
                 catch (Exception exSave)
                 {
@@ -93,12 +95,12 @@ namespace PIK_AR_Acad.Interior.Typology
         }
 
         private void SetDefault ()
-        {
-            ApartmentsChronology = new AcadLib.UI.Properties.XmlSerializableDictionary<string>();
-            foreach (var item in ApartmentBlock.dictNameChronologyDefault)
-            {
-                ApartmentsChronology.Add(item.Key, item.Value);
-            }            
+        {            
+            //ApartmentsChronology = new AcadLib.UI.Properties.XmlSerializableDictionary<string>();
+            //foreach (var item in ApartmentBlock.DictNameChronologyDefault)
+            //{
+            //    ApartmentsChronology.Add(item.Key, item.Value);
+            //}            
         }
 
         private static Options LoadFromXml ()

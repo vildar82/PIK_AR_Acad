@@ -17,7 +17,7 @@ namespace PIK_AR_Acad.Interior.Typology
     /// </summary>
     public class ApartmentBlock : BlockBase, IEquatable<ApartmentBlock>, IComparable<ApartmentBlock>
     {
-        public static Dictionary<string, string> dictNameChronologyDefault = new Dictionary<string, string> ()
+        public static Dictionary<string, string> DictNameChronologyDefault = new Dictionary<string, string> ()
         {
             { "PIK1_1NS1_AO", "9" }, { "PIK1_1NS1_ZO", "9" },
             { "PIK1_1KL1_AO", "4" }, { "PIK1_1KL1_ZO", "4" },
@@ -68,7 +68,7 @@ namespace PIK_AR_Acad.Interior.Typology
             return layer.Color;
         }
 
-        public static List<ApartmentBlock> GetApartments (List<ObjectId> sel, out SchemeBlock scheme)
+        public static List<ApartmentBlock> GetApartments (IEnumerable<ObjectId> sel, out SchemeBlock scheme)
         {
             scheme = null;
             if (!sel.Any()) return null;
@@ -173,7 +173,7 @@ namespace PIK_AR_Acad.Interior.Typology
         private string GetNameChronology (string blName)
         {
             string chrono;
-            if (!Options.Instance.ApartmentsChronology.TryGetValue(blName, out chrono))            
+            if (!DictNameChronologyDefault.TryGetValue(blName, out chrono))            
                 chrono = "-";
             return chrono;            
         }

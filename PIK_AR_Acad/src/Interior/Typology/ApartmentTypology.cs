@@ -28,21 +28,20 @@ namespace PIK_AR_Acad.Interior.Typology
 
         public void CreateTableTypology ()
         {
-            // Выбор блоков квартир (схема дома)
-            var sel = Ed.SelectBlRefs("\nВыбор блоков квартир (схемы дома):");
-            Ed.WriteMessage($"\nВыбрано блоков - {sel.Count}");
+            var sel = Ed.SelectBlRefs("\nВыбор блоков:");
+            Ed.WriteMessage($"\nВыбрано блоков - {sel.Count()}");
 
             // Определение квартир
             SchemeBlock scheme;
-            var apartments = ApartmentBlock.GetApartments (sel, out scheme);
+            var apartments = ApartmentBlock.GetApartments(sel, out scheme);
             Ed.WriteMessage($"\nОпределено блков квартир - {apartments.Count}");
 
             // группировка квартир по типам
-            var groupApartments = apartments.GroupBy(g=>g).OrderBy(o=>o.Key.Type).ThenBy(o=>o.Key).ToList();
-            
+            var groupApartments = apartments.GroupBy(g => g).OrderBy(o => o.Key.Type).ThenBy(o => o.Key).ToList();
+
             using (var t = Db.TransactionManager.StartTransaction())
             {
-                TopologyTable tableService = new TopologyTable (groupApartments, scheme, Db);
+                TopologyTable tableService = new TopologyTable(groupApartments, scheme, Db);
                 tableService.CalcRows();
                 var table = tableService.Create();
                 var scale = AcadLib.Scale.ScaleHelper.GetCurrentAnnoScale(Db);
@@ -51,7 +50,7 @@ namespace PIK_AR_Acad.Interior.Typology
                 TopologyTableSetions tableServiceSections = new TopologyTableSetions(groupApartments, scheme, Db);
                 tableServiceSections.CalcRows();
                 var tableSec = tableServiceSections.Create();
-                tableSec.Position = new Point3d(table.Position.X, table.Position.Y-table.Height- 10*scale,0);
+                tableSec.Position = new Point3d(table.Position.X, table.Position.Y - table.Height - 10 * scale, 0);
                 tableSec.TransformBy(Matrix3d.Scaling(scale, tableSec.Position));
 
                 ObjectId[] ids = new ObjectId[2];
@@ -61,7 +60,7 @@ namespace PIK_AR_Acad.Interior.Typology
                 AcadLib.Jigs.DragSel.Drag(Doc.Editor, ids.ToArray(), Point3d.Origin);
 
                 t.Commit();
-            }            
-        }       
+            }
+        }    
     }
 }
