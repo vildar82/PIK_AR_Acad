@@ -20,23 +20,29 @@ namespace PIK_AR_Acad.Interior.Typology
         public static Dictionary<string, string> DictNameChronologyDefault = new Dictionary<string, string> ()
         {
             { "PIK1_1NS1_AO", "9" }, { "PIK1_1NS1_ZO", "9" },
-            { "PIK1_1KL1_AO", "4" }, { "PIK1_1KL1_ZO", "4" },
+            { "PIK1_1KL1_AO", "4" }, { "PIK1_1KL1_ZO", "4" },{ "PIK1_1KL1_AO (м)", "4" },
             { "PIK1_1KS1_AO", "10" }, { "PIK1_1KS1_ZO", "10" },
+            { "PIK1_1NM1_AO", "29" }, { "PIK1_1NM1_ZO", "29" },
             { "PIK1_1NM2_AO", "6" }, { "PIK1_1NM2_ZO", "6" },
             { "PIK1_1NM3_AO", "2" }, { "PIK1_1NM3_ZO", "2" },
-            { "PIK1_2KL1_AO", "12.1" }, { "PIK1_2KL1_ZO", "12.1" },
+            { "PIK1_2KL1_AO", "17" }, { "PIK1_2KL1_ZO", "17" },{ "PIK1_2KL1_AL", "17" },{ "PIK1_2KL1_ZL", "17" },
+            { "PIK1_2KL2_AO", "23" }, { "PIK1_2KL2_ZO", "23" },
             { "PIK1_2KL3_AO", "5" }, { "PIK1_2KL3_ZO", "5" },
-            { "PIK1_2KL3_AL", "5.1" }, { "PIK1_2KL3_ZL", "5.1" },
-            { "PIK1_2NM1_AO", "3" }, { "PIK1_2NM1_ZO", "3.1" },
+            { "PIK1_2KL3_AL", "5" }, { "PIK1_2KL3_ZL", "5" },
+            { "PIK1_2NM1_AO", "3" }, { "PIK1_2NM1_ZO", "3" },
+            { "PIK1_2NM2_AO", "18" },
             { "PIK1_2NS1_AO", "7" }, { "PIK1_2NS1_ZO", "7" },
+            { "PIK1_2KL_AO_T_(A)", "26" },
             { "PIK1_3KL1_AO", "14" }, { "PIK1_3KL1_ZO", "14" },
-            { "PIK1_3KL1_AL", "14.1" }, { "PIK1_3KL1_Zl", "14.1" },
-            { "PIK1_3KL2_AO", "15" }, { "PIK1_3KL2_ZO", "15" }, { "PIK1_3KL2_ZL", "15.1" },
+            { "PIK1_3KL1_AL", "14" }, { "PIK1_3KL1_Zl", "14" },
+            { "PIK1_3KL2_AO", "15" }, { "PIK1_3KL2_ZO", "15" }, { "PIK1_3KL2_ZL", "15" },
             { "PIK1_3NL1_AO", "1" }, { "PIK1_3NL1_ZO", "1" },
             { "PIK1_3NL2_AO", "8" }, { "PIK1_3NL2_ZO", "8" },
-            { "PIK1_3NL3_AO", "11" }, { "PIK1_3NL3_ZO", "11" },            
-            { "PIK1_4KL2_AL", "13" },
-            { "PIK1_4NL1_ZO", "11.1" }
+            { "PIK1_3NL3_AO", "11" }, { "PIK1_3NL3_ZO", "11" },
+            { "PIK1_3KL_AO_T_(A)", "27" },
+            { "PIK1_4KL2_AO", "16" },{ "PIK1_4KL2_ZO", "16" },{ "PIK1_4KL2_AL", "16" },
+            { "PIK1_4NL1_AO", "11" }, { "PIK1_4NL1_ZO", "11" },
+            { "PIK1_4NL2_AO", "13" }, { "PIK1_4NL2_AL", "13" }
         };
 
 
