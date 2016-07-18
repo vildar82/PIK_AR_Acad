@@ -124,11 +124,11 @@ namespace PIK_AR_Acad.Interior.Typology
                     cell.TextString = apart.Count().ToString();
 
                     row++;
-                }
-
-                // Объединение одинаковых хронологических марок
-                MergeChronoCells(table);
+                }                
             }
+
+            // Объединение одинаковых хронологических марок
+            MergeChronoCells(table);
 
             table.Columns[4].Borders.Bottom.Margin = 4;
             table.Columns[4].Borders.Top.Margin = 4;
@@ -146,7 +146,7 @@ namespace PIK_AR_Acad.Interior.Typology
         {
             string lastChrono = null;
             int lastIndex = 0;
-            for (int i = 2; i < table.Rows.Count - 2; i++)
+            for (int i = 2; i < table.Rows.Count; i++)
             {
                 var cell = table.Cells[i, 1];
 

@@ -181,18 +181,17 @@ namespace PIK_AR_Acad.Interior.Typology
                     }
 
                     curCol++;                        
-                }
-
-                // Объединение одинаковых хронологических марок
-                MergeChronoCells(table);
+                }                
             }
+            // Объединение одинаковых хронологических марок
+            MergeChronoCells(table);
         }
 
         private void MergeChronoCells (Table table)
         {
             string lastChrono = null;
             int lastIndex = 0;
-            for (int i = 2; i < table.Columns.Count-2; i++)
+            for (int i = 2; i < table.Columns.Count; i++)
             {
                 var cell = table.Cells[rowMarkChrono, i];
                 
