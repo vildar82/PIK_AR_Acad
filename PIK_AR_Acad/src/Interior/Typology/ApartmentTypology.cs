@@ -28,16 +28,24 @@ namespace PIK_AR_Acad.Interior.Typology
 
         public void CreateTableTypology ()
         {
-            var sel = Ed.SelectBlRefs("\nВыбор блоков:");
-            Ed.WriteMessage($"\nВыбрано блоков - {sel.Count()}");
+            var sel = Select();
 
             // Определение квартир
             SchemeBlock scheme;
             var apartments = ApartmentBlock.GetApartments(sel, out scheme);
             Ed.WriteMessage($"\nОпределено блков квартир - {apartments.Count}");
 
-            // группировка квартир по типам
-            var groupApartments = apartments.GroupBy(g => g).OrderBy(o => o.Key.Type).ThenBy(o => o.Key).ToList();
+            // группировка квартир
+            List<IGrouping<ApartmentBlock, ApartmentBlock>> groupApartments = null;
+            if (Options.Instance.SortColumn == SortColumnEnum.PIK1)
+            {
+                groupApartments = apartments.GroupBy(g => g).OrderBy(o => o.Key.Type).ThenBy(o => o.Key).ToList();
+            }
+            else if (Options.Instance.SortColumn == SortColumnEnum.Chronology)
+            {
+                groupApartments = apartments.GroupBy(g => g).
+                    OrderBy(o => o.Key.NameChronology, AcadLib.Comparers.AlphanumComparator.New).ToList();
+            }
 
             using (var t = Db.TransactionManager.StartTransaction())
             {
@@ -61,6 +69,32 @@ namespace PIK_AR_Acad.Interior.Typology
 
                 t.Commit();
             }
-        }    
+        }
+
+        private IEnumerable<ObjectId> Select ()
+        {
+            var selOpt = new PromptSelectionOptions();
+            
+            selOpt.Keywords.Add("Options");
+            var keys = selOpt.Keywords.GetDisplayString(true);
+            selOpt.MessageForAdding = "\nВыбор блоков: " + keys;
+            selOpt.KeywordInput += SelOpt_KeywordInput;
+            var selRes = Ed.GetSelection(selOpt);
+
+            if (selRes.Status!= PromptStatus.OK)
+            {
+                throw new Exception(AcadLib.General.CanceledByUser);
+            }
+
+            var selIds = selRes.Value.GetObjectIds();
+                        
+            Ed.WriteMessage($"\nВыбрано блоков - {selIds.Length}");
+            return selIds;
+        }
+
+        private void SelOpt_KeywordInput (object sender, SelectionTextInputEventArgs e)
+        {
+            Options.PromptOptions();
+        }
     }
 }

@@ -74,6 +74,7 @@
     <Compile Include="src\Interior\Typology\Options.cs" />
     <Compile Include="src\Interior\Typology\SchemeBlock.cs" />
     <Compile Include="src\Interior\Typology\Section.cs" />
+    <Compile Include="src\Interior\Typology\SortColumnEnum.cs" />
     <Compile Include="src\Interior\Typology\TopologyTable.cs" />
     <Compile Include="src\Interior\Typology\TopologyTableSetions.cs" />
     <Compile Include="src\LayoutSort\LayoutSortService.cs" />

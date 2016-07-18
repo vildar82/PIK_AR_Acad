@@ -16,13 +16,18 @@ namespace PIK_AR_Acad.Interior.Typology
     {
         static string FileXml = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\Interior\AI_ApartmentsTypology.xml");
         const string DictNod = "AI_ApartmentsTypology";
-        //const string RecAbsoluteZero = "AbsoluteZero";        
-        
+        const string RecSortColumn = "SortColumn";        
+
         //[Category("Общие")]
         //[DisplayName("Хронологические марки квартир")]
         //[Description("Имена квартир новые (PIK) и соответствующие им хронологические имена (старые).")]        
         //[XmlIgnore]
         //public AcadLib.UI.Properties.XmlSerializableDictionary<string> ApartmentsChronology { get; set; }        
+
+        [Category("Сортировка")]
+        [DisplayName("По столбцу")]
+        [Description("Выбор столбца для сотрировки квартир в таблице.")]
+        public SortColumnEnum SortColumn { get; set; } = SortColumnEnum.PIK1;
 
         private static Options _instance;
         public static Options Instance {
@@ -35,27 +40,27 @@ namespace PIK_AR_Acad.Interior.Typology
             }
         }
 
-        public Options PromptOptions ()
+        public static void PromptOptions ()
         {
-            Options resVal = this;
+            Options resVal = Instance;
             //Запрос начальных значений
             AcadLib.UI.FormProperties formProp = new AcadLib.UI.FormProperties();
             Options thisCopy = (Options)resVal.MemberwiseClone();
             formProp.propertyGrid1.SelectedObject = thisCopy;
             if (Application.ShowModalDialog(formProp) != System.Windows.Forms.DialogResult.OK)
             {
-                throw new Exception(General.CanceledByUser);
+                return;
             }
             try
             {
                 resVal = thisCopy;
-                Save();
+                resVal.Save();
+                _instance = resVal;
             }
             catch (Exception ex)
             {
                 Logger.Log.Error(ex, "Не удалось сохранить стартовые параметры.");
-            }
-            return resVal;
+            }            
         }
 
         private static Options Load ()
@@ -66,7 +71,7 @@ namespace PIK_AR_Acad.Interior.Typology
                 try
                 {
                     // Загрузка настроек таблицы из файла XML
-                    //options = Options.LoadFromXml();
+                    options = Options.LoadFromXml();
                 }
                 catch (Exception ex)
                 {
@@ -81,7 +86,7 @@ namespace PIK_AR_Acad.Interior.Typology
                 // Сохранение дефолтных настроек 
                 try
                 {
-                    //options.Save();
+                    options.Save();
                 }
                 catch (Exception exSave)
                 {
@@ -118,14 +123,15 @@ namespace PIK_AR_Acad.Interior.Typology
 
         private void SaveToNOD ()
         {
-            //var nod = new DictNOD(DictNod, true);
-            //nod.Save(AbsoluteZero, RecAbsoluteZero);            
+            var nod = new DictNOD(DictNod, true);
+            nod.Save((int)this.SortColumn, RecSortColumn);            
         }
 
         private void LoadFromNOD ()
         {
-            //var nod = new DictNOD(DictNod, true);
-            //AbsoluteZero = nod.Load(RecAbsoluteZero, AbsoluteZero);            
+            var nod = new DictNOD(DictNod, true);
+            var sortColInt = nod.Load(RecSortColumn, 0);
+            SortColumn = (SortColumnEnum)sortColInt;
         }
     }
 }

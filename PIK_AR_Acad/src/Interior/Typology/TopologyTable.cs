@@ -70,14 +70,9 @@ namespace PIK_AR_Acad.Interior.Typology
 
         protected override void FillCells (Table table)
         {
-            var cs = db.CurrentSpaceId.GetObject( OpenMode.ForWrite) as BlockTableRecord;
+            var cs = db.CurrentSpaceId.GetObject(OpenMode.ForWrite) as BlockTableRecord;
             cs.AppendEntity(table);
-            db.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(table, true);                
-
-            int count = 1;
-            int row = 2;
-            Cell cell;
-            CellRange mCells;
+            db.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(table, true);            
 
             table.Rows[0].Height = 36;
             table.Rows[1].Height = 30;
@@ -85,21 +80,60 @@ namespace PIK_AR_Acad.Interior.Typology
             table.Cells[0, 0].TextHeight = 7;
             table.LineWeight = LineWeight.ByLayer;
 
-            var groupApartments = apartments.GroupBy(g=>g.Key.Type).OrderBy(o=>o.Key);            
+            if (Options.Instance.SortColumn == SortColumnEnum.PIK1)
+            {
+                var groupApartments = apartments.GroupBy(g => g.Key.Type).OrderBy(o => o.Key).ToList();
+                SetCells(table, groupApartments);
 
+                // Объединение одинаковых хронологических марок
+                MergeColCells(table, 1);
+            }
+            else if (Options.Instance.SortColumn == SortColumnEnum.Chronology)
+            {
+                var groupApartments = apartments.GroupBy(g => g.Key.NameChronology).
+                    OrderBy(o => o.Key, AcadLib.Comparers.AlphanumComparator.New).ToList();
+                SetCells(table, groupApartments);
+
+                // Объединение одинаковых типов квартир
+                MergeColCells(table, 2, 90);
+            }                       
+
+            table.Columns[4].Borders.Bottom.Margin = 4;
+            table.Columns[4].Borders.Top.Margin = 4;
+
+            // итого    
+            var lastRow = table.Rows.Count - 1;
+            var mCells = CellRange.Create(table, lastRow, 0, lastRow, 4);
+            table.MergeCells(mCells);
+            var cell = table.Cells[lastRow, 0];
+            cell.TextString = "Итого";
+            cell = table.Cells[lastRow, 5];
+            cell.TextString = apartments.Sum(s => s.Count()).ToString();
+        }
+
+        /// <summary>
+        /// Заполнение строк квартир сгруппированным по типам квартир
+        /// </summary>        
+        private void SetCells (Table table, 
+            List<IGrouping<ApartmentType, IGrouping<ApartmentBlock, ApartmentBlock>>> groupApartments)
+        {
+            int count = 1;
+            int row = 2;
+            Cell cell;
+            CellRange mCells;
             foreach (var group in groupApartments)
             {
                 if (group.Skip(1).Any())
-                { 
+                {
                     // Группировка строк Типов квартир
-                    mCells = CellRange.Create(table, row, 2, row+group.Count()-1, 2);
-                    table.MergeCells(mCells);                    
+                    mCells = CellRange.Create(table, row, 2, row + group.Count() - 1, 2);
+                    table.MergeCells(mCells);
                 }
 
                 cell = table.Cells[row, 2];
                 cell.TextString = group.Key.Names;
                 cell.BackgroundColor = group.Key.Color;
-                cell.Contents[0].Rotation = 90.0.ToRadians();                                
+                cell.Contents[0].Rotation = 90.0.ToRadians();
 
                 foreach (var apart in group)
                 {
@@ -108,63 +142,97 @@ namespace PIK_AR_Acad.Interior.Typology
                     cell.TextString = count++.ToString();
 
                     cell = table.Cells[row, 1];
-                    cell.TextString = apart.Key.NameChronology;                   
+                    cell.TextString = apart.Key.NameChronology;
 
                     cell = table.Cells[row, 3];
-                    cell.TextString = apart.Key.Name;                    
+                    cell.TextString = apart.Key.Name;
 
-                    cell = table.Cells[row, 4];                    
+                    cell = table.Cells[row, 4];
                     cell.BlockTableRecordId = apart.Key.IdBtr;
                     var blockContent = cell.Contents[0];
                     blockContent.IsAutoScale = false;
                     blockContent.Scale = (1 / scale) * 0.4;
-                    blockContent.ContentColor = group.Key.Color;                                        
+                    blockContent.ContentColor = group.Key.Color;
 
                     cell = table.Cells[row, 5];
                     cell.TextString = apart.Count().ToString();
 
                     row++;
-                }                
+                }
             }
-
-            // Объединение одинаковых хронологических марок
-            MergeChronoCells(table);
-
-            table.Columns[4].Borders.Bottom.Margin = 4;
-            table.Columns[4].Borders.Top.Margin = 4;
-
-            // итого    
-            mCells = CellRange.Create(table, row, 0, row, 4);
-            table.MergeCells(mCells);
-            cell = table.Cells[row, 0];
-            cell.TextString = "Итого";
-            cell = table.Cells[row, 5];
-            cell.TextString = apartments.Sum(s=>s.Count()).ToString();            
         }
 
-        private void MergeChronoCells (Table table)
+        /// <summary>
+        /// Заполнение строк квартир сгруппированным по хронологоическому номеру
+        /// </summary>        
+        private void SetCells (Table table, 
+            List<IGrouping<string, IGrouping<ApartmentBlock, ApartmentBlock>>> groupApartments)
         {
-            string lastChrono = null;
+            int count = 1;
+            int row = 2;
+            Cell cell;
+            CellRange mCells;
+            foreach (var group in groupApartments)
+            {
+                foreach (var apart in group)
+                {
+                    table.Rows[row].Height = 20;
+                    cell = table.Cells[row, 0];
+                    cell.TextString = count++.ToString();
+
+                    cell = table.Cells[row, 1];
+                    cell.TextString = apart.Key.NameChronology;
+
+                    cell = table.Cells[row, 2];
+                    cell.TextString = apart.Key.Type.Names;
+                    cell.BackgroundColor = apart.Key.Color;
+
+                    cell = table.Cells[row, 3];
+                    cell.TextString = apart.Key.Name;
+
+                    cell = table.Cells[row, 4];
+                    cell.BlockTableRecordId = apart.Key.IdBtr;
+                    var blockContent = cell.Contents[0];
+                    blockContent.IsAutoScale = false;
+                    blockContent.Scale = (1 / scale) * 0.4;
+                    blockContent.ContentColor = apart.Key.Color;
+
+                    cell = table.Cells[row, 5];
+                    cell.TextString = apart.Count().ToString();
+
+                    row++;
+                }
+            }
+        }
+
+        private void MergeColCells (Table table, int columnIndex, double rotate =0)
+        {
+            string lastText = null;
             int lastIndex = 0;
             for (int i = 2; i < table.Rows.Count; i++)
             {
-                var cell = table.Cells[i, 1];
+                var cell = table.Cells[i, columnIndex];
 
-                if (lastChrono != cell.TextString)
+                if (lastText != cell.TextString)
                 {
-                    if (lastChrono != null)
+                    if (lastText != null)
                     {
-                        var mCells = CellRange.Create(table, lastIndex, 1, i - 1, 1);
+                        var mCells = CellRange.Create(table, lastIndex, columnIndex, i - 1, columnIndex);
                         table.MergeCells(mCells);
+                        if (rotate !=0)
+                        {
+                            var cellMerged = table.Cells[lastIndex, columnIndex];
+                            cellMerged.Contents[0].Rotation = rotate.ToRadians();
+                        }
                     }
                     if (cell.TextString == "-" || string.IsNullOrWhiteSpace(cell.TextString))
                     {
                         lastIndex = 0;
-                        lastChrono = null;
+                        lastText = null;
                     }
                     else
                     {
-                        lastChrono = cell.TextString;
+                        lastText = cell.TextString;
                         lastIndex = i;
                     }
                 }
