@@ -95,6 +95,7 @@ namespace PIK_AR_Acad.Interior.Typology
                 SetCells(table, groupApartments);
 
                 // Объединение одинаковых типов квартир
+                MergeColCells(table, 1, 0);
                 MergeColCells(table, 2, 90);
             }                       
 

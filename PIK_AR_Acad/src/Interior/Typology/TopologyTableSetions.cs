@@ -32,12 +32,13 @@ namespace PIK_AR_Acad.Interior.Typology
         public override void CalcRows ()
         {
             NumColumns = apartments.Count + 3;            
-            NumRows = 8 + (scheme== null? 0: scheme.Sections.Count);
+            NumRows = 8 + (scheme.Sections.Count >1? scheme.Sections.Count: 0);
             Title = $"Типология квартир на этаже - {scheme?.Name} : {DateTime.Now}";
         }
 
         protected override void SetColumnsAndCap (ColumnsCollection columns)
-        {            
+        {
+            Cell cell;
             var col = columns[0];
             var table = col.ParentTable;           
 
@@ -69,19 +70,21 @@ namespace PIK_AR_Acad.Interior.Typology
             col = columns[1];            
             col.Width = 60;
 
-            scheme.Sections.Sort((s1, s2) => AcadLib.Comparers.AlphanumComparator.New.Compare(s1.Name, s2.Name));
             int rowSec = 6;
-            foreach (var item in scheme.Sections)
+            if (scheme.Sections.Count > 1)
             {
-                item.TableRowIndex = rowSec;
-                col[rowSec++, 1].TextString = $"{item.Name}\n({item.NumberFloors}эт.)";     
-            }            
-
-            mCells = CellRange.Create(table, 6, 0, rowSec-1, 0);
-            table.MergeCells(mCells);
-            var cell = table.Cells[6, 0];
-            cell.TextString = "Кол-во квартир по секциям на этаже, шт.";
-            cell.Contents[0].Rotation = 90.0.ToRadians();
+                scheme.Sections.Sort((s1, s2) => AcadLib.Comparers.AlphanumComparator.New.Compare(s1.Name, s2.Name));                
+                foreach (var item in scheme.Sections)
+                {
+                    item.TableRowIndex = rowSec;
+                    col[rowSec++, 1].TextString = $"{item.Name}\n({item.NumberFloors}эт.)";
+                }
+                mCells = CellRange.Create(table, 6, 0, rowSec - 1, 0);
+                table.MergeCells(mCells);
+                cell = table.Cells[6, 0];
+                cell.TextString = "Кол-во квартир по секциям на этаже, шт.";
+                cell.Contents[0].Rotation = 90.0.ToRadians();
+            }
 
             col = columns[0];
             rowCountInFloor = rowSec;
@@ -159,17 +162,20 @@ namespace PIK_AR_Acad.Interior.Typology
                     blockContent.Scale = (1 / scale) * 0.5;
                     blockContent.ContentColor = group.Key.Color;
 
-                    foreach (var item in scheme.Sections)
-                    {
-                        cell = table.Cells[item.TableRowIndex, curCol];
-                        cell.TextString = "-";
-                    }
-
                     var groupBySec = apart.GroupBy(g => g.Section);
-                    foreach (var item in groupBySec)
-                    {   
-                        cell = table.Cells[item.Key.TableRowIndex, curCol];
-                        cell.TextString = item.Count().ToString();
+                    if (scheme.Sections.Count > 1)
+                    {
+                        foreach (var item in scheme.Sections)
+                        {
+                            cell = table.Cells[item.TableRowIndex, curCol];
+                            cell.TextString = "-";
+                        }
+                                                
+                        foreach (var item in groupBySec)
+                        {
+                            cell = table.Cells[item.Key.TableRowIndex, curCol];
+                            cell.TextString = item.Count().ToString();
+                        }
                     }
 
                     cell = table.Cells[rowCountInFloor, curCol];
