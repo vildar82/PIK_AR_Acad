@@ -40,6 +40,8 @@ namespace PIK_AR_Acad.Interior.Typology
                 case '1':
                     if (apartCode.ToUpper().Contains("NS"))
                         type = Studio;
+                    else if (apartCode.ToUpper().Contains("NM"))
+                        type = Studio;
                     else
                         type = OneBedroom;                    
                     break;
