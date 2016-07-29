@@ -20,15 +20,15 @@ namespace PIK_AR_Acad.Interior.Typology
         public static Dictionary<string, string> DictNameChronologyDefault = new Dictionary<string, string> ()
         {
             { "PIK1_1NS1_AO", "9" }, { "PIK1_1NS1_ZO", "9" },
-            { "PIK1_1KL1_AO", "4" }, { "PIK1_1KL1_ZO", "4" },{ "PIK1_1KL1_AO (м)", "4" },
-            { "PIK1_1KS1_AO", "10" }, { "PIK1_1KS1_ZO", "10" },
+            { "PIK1_1KL1_AO", "4" }, { "PIK1_1KL1_ZO", "4" },{ "PIK1_1KL1_AO_(m)", "4" },
+            { "PIK1_1KS1_AO", "10" }, { "PIK1_1KS1_ZO", "10" }, { "PIK1_1KS1_AO_(A)", "10" },
             { "PIK1_1NM1_AO", "29" }, { "PIK1_1NM1_ZO", "29" },
             { "PIK1_1NM2_AO", "6" }, { "PIK1_1NM2_ZO", "6" },
             { "PIK1_1NM3_AO", "2" }, { "PIK1_1NM3_ZO", "2" },
             { "PIK1_2KL1_AO", "17" }, { "PIK1_2KL1_ZO", "17" },{ "PIK1_2KL1_AL", "17" },{ "PIK1_2KL1_ZL", "17" },
             { "PIK1_2KL2_AO", "23" }, { "PIK1_2KL2_ZO", "23" },
             { "PIK1_2KL3_AO", "5" }, { "PIK1_2KL3_ZO", "5" },
-            { "PIK1_2KL3_AL", "5" }, { "PIK1_2KL3_ZL", "5" },
+            { "PIK1_2KL3_AL", "5" }, { "PIK1_2KL3_ZL", "5" },{ "PIK1_2KL3_ZO_(А)", "5" },
             { "PIK1_2NM1_AO", "3" }, { "PIK1_2NM1_ZO", "3" },
             { "PIK1_2NM2_AO", "18" },
             { "PIK1_2NS1_AO", "7" }, { "PIK1_2NS1_ZO", "7" },
