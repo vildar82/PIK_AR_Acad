@@ -18,6 +18,7 @@ namespace PIK_AR_Acad.Interior.Typology
         public string Name { get; set; } = string.Empty;
         public Extents3d Bounds { get; set; }
         public int TableRowIndex { get; internal set; }
+        public bool Fail { get; internal set; }
 
         public Section(Polyline plContour, ObjectId idPlOrigin)
         {

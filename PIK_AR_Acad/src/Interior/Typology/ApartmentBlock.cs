@@ -124,10 +124,11 @@ namespace PIK_AR_Acad.Interior.Typology
             var secNull = new Section(null, ObjectId.Null);
             secNull.Name = "Неопределенная";
 
-            if (scheme == null)
+            if (scheme == null || scheme.Sections == null)
             {
-                Inspector.AddError($"Не определен блок схемы", System.Drawing.SystemIcons.Error);
-
+                string help = "Схема дома - блок, имя начинается с 'Схема_'. В блоке схемы: однострочный текст начинающийся с подчеркивания - имя схемы. " + 
+                     "Секция - полилиния с толщиной >=30, рядом с которой однострочные тексты 'Секция #' и '# этажей'.";
+                Inspector.AddError($"Не определен блок схемы.\n" + help , System.Drawing.SystemIcons.Error);
                 scheme = new SchemeBlock(null, null);                
             }
             else if (scheme.Sections.Count == 0)

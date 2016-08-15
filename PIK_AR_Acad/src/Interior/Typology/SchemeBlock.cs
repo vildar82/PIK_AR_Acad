@@ -88,6 +88,7 @@ namespace PIK_AR_Acad.Interior.Typology
                 {
                     Inspector.AddError($"Не определено имя секции в схеме.", item.IdPlOrigin, item.Bounds, 
                         System.Drawing.SystemIcons.Warning);
+                    item.Fail = true;
                 }
                 else
                 {
@@ -100,6 +101,7 @@ namespace PIK_AR_Acad.Interior.Typology
                 {
                     Inspector.AddError($"Не определена этажность секции в схеме.", item.IdPlOrigin, item.Bounds, 
                         System.Drawing.SystemIcons.Warning);
+                    item.Fail = true;
                 }
                 else
                 {
@@ -107,19 +109,26 @@ namespace PIK_AR_Acad.Interior.Typology
                     textFloors.Remove(textFloor);                    
                 }
             }
-            foreach (var item in Sections)
+            if (Sections.Any(s => s.Fail))
             {
-                if (!string.IsNullOrEmpty(item.Name) && item.NumberFloors != 0)
+                Sections = null;
+            }
+            else
+            {
+                foreach (var item in Sections)
                 {
-                    Inspector.AddError($"{item.Name}, {item.NumberFloors} этажная", item.Bounds, item.IdPlOrigin, 
-                        System.Drawing.SystemIcons.Information);
+                    if (!string.IsNullOrEmpty(item.Name) && item.NumberFloors != 0)
+                    {
+                        Inspector.AddError($"{item.Name}, {item.NumberFloors} этажная", item.Bounds, item.IdPlOrigin,
+                            System.Drawing.SystemIcons.Information);
+                    }
                 }
             }
         }
 
         private DBText findNearest (Point3d ptItem, List<DBText> textSections)
         {
-            var res = textSections.OrderBy(o => (ptItem - o.Position).Length).First();
+            var res = textSections.OrderBy(o => (ptItem - o.Position).Length).FirstOrDefault();
             return res;
         }
 
