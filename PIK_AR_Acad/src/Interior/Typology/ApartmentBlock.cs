@@ -36,6 +36,8 @@ namespace PIK_AR_Acad.Interior.Typology
             { "PIK1_3KL1_A0", "14" }, { "PIK1_3KL1_Z0", "14" },
             { "PIK1_3KL1_AL", "14" }, { "PIK1_3KL1_ZL", "14" },
             { "PIK1_3KL2_A0", "15" }, { "PIK1_3KL2_Z0", "15" }, { "PIK1_3KL2_ZL", "15" },
+            { "PIK1_3KL3_A0", "21" }, { "PIK1_3KL3_Z0", "21" },
+            { "PIK1_3KL_Z0_T_(B)", "28" }, { "PIK1_3KL_A0_T_(B)", "28" },
             { "PIK1_3NL1_A0", "1" }, { "PIK1_3NL1_Z0", "1" },
             { "PIK1_3NL2_A0", "8" }, { "PIK1_3NL2_Z0", "8" },
             { "PIK1_3NL3_A0", "11" }, { "PIK1_3NL3_Z0", "11" },
