@@ -33,7 +33,7 @@ namespace PIK_AR_Acad.Interior.Typology
         public static ApartmentType GetType (ApartmentBlock apartment)
         {            
             ApartmentType type = null;
-            string apartCode = apartment.Name.Substring(ApartmentBlock.BlockNamePrefix.Length);
+            string apartCode = apartment.Name.Substring(apartment.Name.IndexOf('_', 1)+1);
             var firstIndex = apartCode[0];
             switch (firstIndex)
             {

@@ -48,7 +48,7 @@ namespace PIK_AR_Acad.Interior.Typology
         };
 
 
-        public const string BlockNamePrefix = "PIK1_";
+        public const string BlockNamePrefix = "flat_";
         public override Color Color { get; set; }
         public ApartmentType Type { get; set; }
         public string Name { get; set; }
@@ -62,7 +62,7 @@ namespace PIK_AR_Acad.Interior.Typology
             Center = Bounds.Value.Center();
             NameChronology = GetNameChronology(blName);
             Color = GetColor(blRef);        
-            Name = blName;
+            Name = blName.Substring(BlockNamePrefix.Length);
             Type = ApartmentType.GetType(this);
             if (Type == null)
             {
@@ -86,6 +86,9 @@ namespace PIK_AR_Acad.Interior.Typology
 
             using (var t = db.TransactionManager.StartTransaction())
             {
+                // Переименование блоков PIK1
+                RenameOldblocksApartmentsPIK1ToNewFlat(db, t);
+
                 foreach (var item in sel)
                 {
                     var blRef = item.GetObject( OpenMode.ForRead) as BlockReference;
@@ -119,6 +122,20 @@ namespace PIK_AR_Acad.Interior.Typology
                 t.Commit();
             }
             return apartments;
+        }
+
+        private static void RenameOldblocksApartmentsPIK1ToNewFlat (Database db, Transaction t)
+        {
+            var bt = db.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable;
+            foreach (var idBlk in bt)
+            {
+                var block = idBlk.GetObject(OpenMode.ForRead) as BlockTableRecord;
+                if (block.Name.StartsWith("PIK1_", StringComparison.OrdinalIgnoreCase))
+                {
+                    block.UpgradeOpen();
+                    block.Name = BlockNamePrefix + block.Name;
+                }
+            }
         }
 
         private static void defineSections (List<ApartmentBlock> apartments,ref SchemeBlock scheme)
