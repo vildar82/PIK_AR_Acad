@@ -57,7 +57,7 @@ namespace PIK_AR_Acad.Interior.Typology
 
             mCells = CellRange.Create(table, 3, 0, 3, 1);
             table.MergeCells(mCells);
-            col[3, 0].TextString = "Марка PIK1";
+            col[3, 0].TextString = "Марка";
 
             mCells = CellRange.Create(table, 4, 0, 4, 1);
             table.MergeCells(mCells);

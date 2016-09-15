@@ -53,7 +53,7 @@ namespace PIK_AR_Acad.Interior.Typology
             col = columns[3];
             col.Alignment = CellAlignment.MiddleCenter;
             col.Width = 48;
-            col[1, 3].TextString = "Имя в системе PIK 1";
+            col[1, 3].TextString = "Имя";
 
             // столбец Схема
             col = columns[4];
