@@ -160,7 +160,7 @@ namespace PIK_AR_Acad.Interior.Typology
                     var blockContent = cell.Contents[0];
                     blockContent.IsAutoScale = false;
                     blockContent.Scale = (1 / scale) * 0.5;
-                    blockContent.ContentColor = group.Key.Color;
+                    blockContent.ContentColor = apart.Key.Color;
 
                     var groupBySec = apart.GroupBy(g => g.Section);
                     if (scheme.Sections.Count > 1)

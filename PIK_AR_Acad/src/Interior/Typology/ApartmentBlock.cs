@@ -25,6 +25,7 @@ namespace PIK_AR_Acad.Interior.Typology
             { "PIK1_1NM1_A0", "29" }, { "PIK1_1NM1_Z0", "29" },
             { "PIK1_1NM2_A0", "6" }, { "PIK1_1NM2_Z0", "6" },
             { "PIK1_1NM3_A0", "2" }, { "PIK1_1NM3_Z0", "2" },
+            { "PIK1_1NS2_A0", "9" },
             { "PIK1_2KL1_A0", "17" }, { "PIK1_2KL1_Z0", "17" },{ "PIK1_2KL1_AL", "17" },{ "PIK1_2KL1_ZL", "17" },
             { "PIK1_2KL2_A0", "23" }, { "PIK1_2KL2_Z0", "23" },
             { "PIK1_2KL3_A0", "5" }, { "PIK1_2KL3_Z0", "5" },
@@ -49,7 +50,7 @@ namespace PIK_AR_Acad.Interior.Typology
 
 
         public const string BlockNamePrefix = "flat_";
-        public override Color Color { get; set; }
+        public new Color Color { get; set; }
         public ApartmentType Type { get; set; }
         public string Name { get; set; }
         public string NameChronology { get; set; } = "-";
@@ -59,16 +60,38 @@ namespace PIK_AR_Acad.Interior.Typology
 
         public ApartmentBlock (BlockReference blRef, string blName) : base(blRef, blName)
         {
-            Center = Bounds.Value.Center();
-            NameChronology = GetNameChronology(blName);
-            Color = GetColor(blRef);        
+            Center = Bounds.Value.Center();                        
             Name = blName.Substring(BlockNamePrefix.Length);
+            NameChronology = GetNameChronology(Name);
             Type = ApartmentType.GetType(this);
             if (Type == null)
             {
                 AddError($"Не определен тип квартиры по блоку - {blName}");
             }
-        }        
+            else
+            {
+                // проверка слоя
+                CheckApartmentLayer(blRef);
+            }
+            //Color = GetColor(blRef);            
+        }
+
+        private void CheckApartmentLayer (BlockReference blRef)
+        {
+            var apartLay = ApartmentTypology.ApartmentLayers[Type];
+            if (!BlLayer.Equals(apartLay.Name, StringComparison.OrdinalIgnoreCase))
+            {
+                blRef.UpgradeOpen();
+                blRef.LayerId = apartLay.Id;
+                blRef.DowngradeOpen();
+            }
+            if (!blRef.Color.IsByLayer)
+            {
+                blRef.UpgradeOpen();
+                blRef.Color = Color.FromColorIndex(ColorMethod.ByLayer, 256);
+            }
+            Color = apartLay.Color;
+        }
 
         private Color GetColor (BlockReference blRef)
         {
@@ -98,7 +121,7 @@ namespace PIK_AR_Acad.Interior.Typology
 
                     if (IsApartmentBlock(blName))
                     {
-                        var apartment = new ApartmentBlock(blRef, blName);
+                        var apartment = new ApartmentBlock(blRef, blName);                        
                         if (apartment.Error != null)
                         {
                             Inspector.AddError(apartment.Error);
@@ -196,10 +219,10 @@ namespace PIK_AR_Acad.Interior.Typology
             return res;
         }
 
-        private string GetNameChronology (string blName)
+        private string GetNameChronology (string name)
         {
             string chrono;
-            if (!DictNameChronologyDefault.TryGetValue(blName, out chrono))            
+            if (!DictNameChronologyDefault.TryGetValue(name, out chrono))            
                 chrono = "-";
             return chrono;            
         }

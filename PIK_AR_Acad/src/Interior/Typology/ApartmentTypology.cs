@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
@@ -19,6 +20,15 @@ namespace PIK_AR_Acad.Interior.Typology
         public Database Db { get; set; }
         public Editor Ed { get; set; }
 
+        public static Dictionary<ApartmentType, ApartmentLayer> ApartmentLayers = new Dictionary<ApartmentType, ApartmentLayer> {
+            { ApartmentType.Studio, new ApartmentLayer (ApartmentType.Studio, "S_Квартиры_0_студия", Color.FromRgb(233,107,130)) },
+            { ApartmentType.OneBedroom, new ApartmentLayer (ApartmentType.OneBedroom, "S_Квартиры_1", Color.FromRgb(139,168,222)) },
+            { ApartmentType.TwoBedroom, new ApartmentLayer (ApartmentType.TwoBedroom, "S_Квартиры_2", Color.FromRgb(228,183,24)) },
+            { ApartmentType.ThreeBedroom, new ApartmentLayer (ApartmentType.ThreeBedroom, "S_Квартиры_3", Color.FromRgb(148,183,28)) },
+            { ApartmentType.FourBedroom, new ApartmentLayer (ApartmentType.FourBedroom, "S_Квартиры_4", Color.FromRgb(232,133,85)) },
+            { ApartmentType.FiveBedroom, new ApartmentLayer (ApartmentType.FiveBedroom, "S_Квартиры_5", Color.FromRgb(1,1,1)) }
+        };
+
         public ApartmentTypology (Document doc)
         {
             Doc = doc;
@@ -29,6 +39,9 @@ namespace PIK_AR_Acad.Interior.Typology
         public void CreateTableTypology ()
         {
             var sel = Select();
+
+            // Слои для квартир
+            DefineApartmentLayers();
 
             // Определение квартир
             SchemeBlock scheme;
@@ -67,6 +80,37 @@ namespace PIK_AR_Acad.Interior.Typology
 
                 AcadLib.Jigs.DragSel.Drag(Doc.Editor, ids.ToArray(), Point3d.Origin);
 
+                t.Commit();
+            }
+        }
+
+        private void DefineApartmentLayers ()
+        {
+            using (var t = Db.TransactionManager.StartTransaction())
+            {
+                var lt = Db.LayerTableId.GetObject(OpenMode.ForRead) as LayerTable;
+
+                foreach (var item in ApartmentLayers)
+                {
+                    var apartLay = item.Value;
+                    LayerTableRecord lay;
+                    if (lt.Has(item.Value.Name))
+                    {
+                        lay = lt[apartLay.Name].GetObject( OpenMode.ForWrite) as LayerTableRecord;                        
+                    }
+                    else
+                    {
+                        lt.UpgradeOpen();
+                        lay = new LayerTableRecord();
+                        lay.Name = apartLay.Name;
+                        lt.Add(lay);
+                        t.AddNewlyCreatedDBObject(lay, true);
+                    }
+
+                    if (lay.Color != apartLay.Color)                    
+                        lay.Color = apartLay.Color;
+                    apartLay.Id = lay.Id;                    
+                }
                 t.Commit();
             }
         }

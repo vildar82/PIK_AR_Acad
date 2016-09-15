@@ -13,17 +13,17 @@ namespace PIK_AR_Acad.Interior.Typology
     /// </summary>
     public class ApartmentType : IEquatable<ApartmentType>, IComparable<ApartmentType>
     {
-        static ApartmentType Studio = new ApartmentType(0) { Name = "Студия", Names = "Студии" };
-        static ApartmentType OneBedroom = new ApartmentType(1) { Name = "Однокомнатная", Names = "Однокомнатные" };        
-        static ApartmentType TwoBedroom = new ApartmentType(2) { Name = "Двухкомнатная", Names = "Двухкомнатные" };
-        static ApartmentType ThreeBedroom = new ApartmentType(3) { Name = "3-комнатная", Names = "3-комнатные" };
-        static ApartmentType FourBedroom = new ApartmentType(4) { Name = "4-комнатная", Names = "4-комнатные" };
-        static ApartmentType FiveBedroom = new ApartmentType(5) { Name = "5-комнатная", Names = "5-комнатные" };
+        public static ApartmentType Studio = new ApartmentType(0) { Name = "Студия", Names = "Студии" };
+        public static ApartmentType OneBedroom = new ApartmentType(1) { Name = "Однокомнатная", Names = "Однокомнатные" };        
+        public static ApartmentType TwoBedroom = new ApartmentType(2) { Name = "Двухкомнатная", Names = "Двухкомнатные" };
+        public static ApartmentType ThreeBedroom = new ApartmentType(3) { Name = "3-комнатная", Names = "3-комнатные" };
+        public static ApartmentType FourBedroom = new ApartmentType(4) { Name = "4-комнатная", Names = "4-комнатные" };
+        public static ApartmentType FiveBedroom = new ApartmentType(5) { Name = "5-комнатная", Names = "5-комнатные" };
 
         private int index;
         public string Name { get; set; }
         public string Names { get; set; }
-        public Color Color { get; set; }
+        //public Color Color { get; set; }
 
         private ApartmentType(int index)
         {
@@ -38,10 +38,8 @@ namespace PIK_AR_Acad.Interior.Typology
             switch (firstIndex)
             {
                 case '1':
-                    if (apartCode.ToUpper().Contains("NS"))
-                        type = Studio;
-                    else if (apartCode.ToUpper().Contains("NM"))
-                        type = Studio;
+                    if (apartCode.Substring(1).StartsWith("N"))
+                        type = Studio;                    
                     else
                         type = OneBedroom;                    
                     break;
@@ -57,12 +55,7 @@ namespace PIK_AR_Acad.Interior.Typology
                 case '5':
                     type = FiveBedroom;
                     break;                
-            }
-
-            if (type != null)
-            {
-                type.Color = apartment.Color;
-            }
+            }            
             return type;
         }
 

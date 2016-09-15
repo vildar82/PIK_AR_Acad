@@ -133,7 +133,8 @@ namespace PIK_AR_Acad.Interior.Typology
 
                 cell = table.Cells[row, 2];
                 cell.TextString = group.Key.Names;
-                cell.BackgroundColor = group.Key.Color;
+                var first = group.First().Key;
+                cell.BackgroundColor = first.Color;
                 cell.Contents[0].Rotation = 90.0.ToRadians();
 
                 foreach (var apart in group)
@@ -153,7 +154,7 @@ namespace PIK_AR_Acad.Interior.Typology
                     var blockContent = cell.Contents[0];
                     blockContent.IsAutoScale = false;
                     blockContent.Scale = (1 / scale) * 0.4;
-                    blockContent.ContentColor = group.Key.Color;
+                    blockContent.ContentColor = first.Color;
 
                     cell = table.Cells[row, 5];
                     cell.TextString = apart.Count().ToString();
