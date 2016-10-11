@@ -78,10 +78,10 @@ namespace PIK_AR_Acad.Interior.Typology
                 ids[0] = table.Id;
                 ids[1] = tableSec.Id;
 
-                AcadLib.Jigs.DragSel.Drag(Doc.Editor, ids.ToArray(), Point3d.Origin);
+                AcadLib.Jigs.DragSel.Drag(Doc.Editor, ids, Point3d.Origin);
 
                 t.Commit();
-            }
+            }            
         }
 
         private void DefineApartmentLayers ()
