@@ -9,7 +9,7 @@ using Autodesk.AutoCAD.Colors;
 
 namespace PIK_AR_Acad.Interior.Typology
 {
-    public class TopologyTableSetions : AcadLib.Tables.CreateTable
+    public class TopologyTableSections : AcadLib.Tables.CreateTable
     {
         Color badColor = Color.FromColorIndex( ColorMethod.ByAci, 1);
         int rowNumberPP = 1;
@@ -22,7 +22,7 @@ namespace PIK_AR_Acad.Interior.Typology
         List<IGrouping<ApartmentBlock, ApartmentBlock>> apartments;
         SchemeBlock scheme;
 
-        public TopologyTableSetions (List<IGrouping<ApartmentBlock, ApartmentBlock>> apartments, SchemeBlock scheme, Database db) : base(db)
+        public TopologyTableSections (List<IGrouping<ApartmentBlock, ApartmentBlock>> apartments, SchemeBlock scheme, Database db) : base(db)
         {
             this.apartments = apartments;
             LwBold = LineWeight.ByLayer;

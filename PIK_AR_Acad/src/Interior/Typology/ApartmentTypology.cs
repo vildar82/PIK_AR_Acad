@@ -68,7 +68,7 @@ namespace PIK_AR_Acad.Interior.Typology
                 var scale = AcadLib.Scale.ScaleHelper.GetCurrentAnnoScale(Db);
                 table.TransformBy(Matrix3d.Scaling(scale, table.Position));
 
-                TopologyTableSetions tableServiceSections = new TopologyTableSetions(groupApartments, scheme, Db);
+                TopologyTableSections tableServiceSections = new TopologyTableSections(groupApartments, scheme, Db);
                 tableServiceSections.CalcRows();
                 var tableSec = tableServiceSections.Create();
                 tableSec.Position = new Point3d(table.Position.X, table.Position.Y - table.Height - 10 * scale, 0);
