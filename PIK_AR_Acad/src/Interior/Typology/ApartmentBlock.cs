@@ -19,35 +19,30 @@ namespace PIK_AR_Acad.Interior.Typology
     {
         public static Dictionary<string, string> DictNameChronologyDefault = new Dictionary<string, string> ()
         {
-            { "PIK1_1NS1_A0", "9" }, { "PIK1_1NS1_Z0", "9" },
-            { "PIK1_1KL1_A0", "4" }, { "PIK1_1KL1_Z0", "4" },{ "PIK1_1KL1_A0_(m)", "4" },
-            { "PIK1_1KS1_A0", "10" }, { "PIK1_1KS1_Z0", "10" }, { "PIK1_1KS1_A0_(A)", "10" },
-            { "PIK1_1NM1_A0", "29" }, { "PIK1_1NM1_Z0", "29" },
-            { "PIK1_1NM2_A0", "6" }, { "PIK1_1NM2_Z0", "6" },
+            { "PIK1_3NL1_A0", "1" }, { "PIK1_3NL1_Z0", "1" }, { "PIK1_3NL1_AL", "1" },{ "PIK1_3NL1_ZL", "1" },
             { "PIK1_1NM3_A0", "2" }, { "PIK1_1NM3_Z0", "2" },
-            { "PIK1_1NS2_A0", "9" },
-            { "PIK1_2KL1_A0", "17" }, { "PIK1_2KL1_Z0", "17" },{ "PIK1_2KL1_AL", "17" },{ "PIK1_2KL1_ZL", "17" },
-            { "PIK1_2KL2_A0", "23" }, { "PIK1_2KL2_Z0", "23" },
-            { "PIK1_2KL3_A0", "5" }, { "PIK1_2KL3_Z0", "5" },
-            { "PIK1_2KL3_AL", "5" }, { "PIK1_2KL3_ZL", "5" },{ "PIK1_2KL3_Z0_(А)", "5" },
             { "PIK1_2NM1_A0", "3" }, { "PIK1_2NM1_Z0", "3" },
-            { "PIK1_2NM2_A0", "18" },
+            { "PIK1_1KL1_A0", "4" }, { "PIK1_1KL1_Z0", "4" },{ "PIK1_1KL1_A0_(m)", "4" },
+            { "PIK1_2KL3_A0", "5" }, { "PIK1_2KL3_Z0", "5" }, { "PIK1_2KL3_AL", "5" }, { "PIK1_2KL3_ZL", "5" },{ "PIK1_2KL3_Z0_(А)", "5" },
+            { "PIK1_1NM2_A0", "6" }, { "PIK1_1NM2_Z0", "6" },
             { "PIK1_2NS1_A0", "7" }, { "PIK1_2NS1_Z0", "7" },
-            { "PIK1_2KL_A0_T_(A)", "26" },
-            { "PIK1_3KL1_A0", "14" }, { "PIK1_3KL1_Z0", "14" },
-            { "PIK1_3KL1_AL", "14" }, { "PIK1_3KL1_ZL", "14" },
-            { "PIK1_3KL2_A0", "15" }, { "PIK1_3KL2_Z0", "15" }, { "PIK1_3KL2_ZL", "15" },
-            { "PIK1_3KL3_A0", "21" }, { "PIK1_3KL3_Z0", "21" },
-            { "PIK1_3KL_Z0_T_(B)", "28" }, { "PIK1_3KL_A0_T_(B)", "28" },
-            { "PIK1_3NL1_A0", "1" }, { "PIK1_3NL1_Z0", "1" },
             { "PIK1_3NL2_A0", "8" }, { "PIK1_3NL2_Z0", "8" },
-            { "PIK1_3NL3_A0", "11" }, { "PIK1_3NL3_Z0", "11" },
-            { "PIK1_3KL_A0_T_(A)", "27" },
+            { "PIK1_1NS1_A0", "9" }, { "PIK1_1NS1_Z0", "9" }, { "PIK1_1NS2_A0", "9" },
+            { "PIK1_1KS1_A0", "10" }, { "PIK1_1KS1_Z0", "10" }, { "PIK1_1KS1_A0_(A)", "10" },{ "PIK1_1KS1_Z0_(A)", "10" },
+            { "PIK1_3NL3_A0", "11" }, { "PIK1_3NL3_Z0", "11" }, { "PIK1_4NL1_A0", "11" }, { "PIK1_4NL1_Z0", "11" },
+            { "PIK1_4NL2_A0", "13" }, { "PIK1_4NL2_AL", "13" },
+            { "PIK1_3KL1_A0", "14" }, { "PIK1_3KL1_Z0", "14" },{ "PIK1_3KL1_AL", "14" }, { "PIK1_3KL1_ZL", "14" },
+            { "PIK1_3KL2_A0", "15" }, { "PIK1_3KL2_Z0", "15" }, { "PIK1_3KL2_ZL", "15" }, { "PIK1_3KL2_AL", "15" },
             { "PIK1_4KL2_A0", "16" },{ "PIK1_4KL2_Z0", "16" },{ "PIK1_4KL2_AL", "16" },
-            { "PIK1_4NL1_A0", "11" }, { "PIK1_4NL1_Z0", "11" },
-            { "PIK1_4NL2_A0", "13" }, { "PIK1_4NL2_AL", "13" }
+            { "PIK1_2KL1_A0", "17" }, { "PIK1_2KL1_Z0", "17" },{ "PIK1_2KL1_AL", "17" },{ "PIK1_2KL1_ZL", "17" },
+            { "PIK1_2NM2_A0", "18" },
+            { "PIK1_3KL3_A0", "21" }, { "PIK1_3KL3_Z0", "21" },            
+            { "PIK1_2KL2_A0", "23" }, { "PIK1_2KL2_Z0", "23" },            
+            { "PIK1_2KL_A0_T_(A)", "26" },
+            { "PIK1_3KL_A0_T_(A)", "27" },
+            { "PIK1_3KL_Z0_T_(B)", "28" }, { "PIK1_3KL_A0_T_(B)", "28" },            
+            { "PIK1_1NM1_A0", "29" }, { "PIK1_1NM1_Z0", "29" },
         };
-
 
         public const string BlockNamePrefix = "flat_";
         public new Color Color { get; set; }
@@ -222,7 +217,7 @@ namespace PIK_AR_Acad.Interior.Typology
         private string GetNameChronology (string name)
         {
             string chrono;
-            if (!DictNameChronologyDefault.TryGetValue(name, out chrono))            
+            if (!Options.Instance.Apartments.TryGetValue(name, out chrono))            
                 chrono = "-";
             return chrono;            
         }

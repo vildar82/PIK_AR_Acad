@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using AcadLib;
 using Autodesk.AutoCAD.ApplicationServices;
+using System.Collections;
+using AcadLib.UI.Properties;
+using System.Drawing.Design;
 
 namespace PIK_AR_Acad.Interior.Typology
 {
@@ -16,7 +19,7 @@ namespace PIK_AR_Acad.Interior.Typology
     {
         static string FileXml = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\Interior\AI_ApartmentsTypology.xml");
         const string DictNod = "AI_ApartmentsTypology";
-        const string RecSortColumn = "SortColumn";        
+        const string RecSortColumn = "SortColumn";
 
         //[Category("Общие")]
         //[DisplayName("Хронологические марки квартир")]
@@ -29,6 +32,15 @@ namespace PIK_AR_Acad.Interior.Typology
         [Description("Выбор столбца для сотрировки квартир в таблице.")]
         public SortColumnEnum SortColumn { get; set; } = SortColumnEnum.PIK1;
 
+        [Category("Квартиры")]
+        [DisplayName("Квартиры")]
+        [Description("Редактирование хронологических номеров квартир.")]
+        [ReadOnly(false)]
+        [Editor(typeof(AcadLib.UI.Designer.GenericDictionaryEditor<string, string>), typeof(UITypeEditor))]
+        [AcadLib.UI.Designer.GenericDictionaryEditor(Title ="Редактор хронологических имен квартир",
+            KeyDisplayName = "Квартира", ValueDisplayName = "Хронологическое имя")]
+        public XmlSerializableDictionary <string> Apartments { get; set; }
+                
         private static Options _instance;
         public static Options Instance {
             get {
@@ -40,12 +52,16 @@ namespace PIK_AR_Acad.Interior.Typology
             }
         }
 
+        public Options()
+        {
+        }
+
         public static void PromptOptions ()
         {
             Options resVal = Instance;
             //Запрос начальных значений
-            AcadLib.UI.FormProperties formProp = new AcadLib.UI.FormProperties();
-            Options thisCopy = (Options)resVal.MemberwiseClone();
+            var formProp = new AcadLib.UI.FormProperties();
+            var thisCopy = (Options)resVal.MemberwiseClone();
             formProp.propertyGrid1.SelectedObject = thisCopy;
             if (Application.ShowModalDialog(formProp) != System.Windows.Forms.DialogResult.OK)
             {
@@ -71,7 +87,16 @@ namespace PIK_AR_Acad.Interior.Typology
                 try
                 {
                     // Загрузка настроек таблицы из файла XML
-                    options = Options.LoadFromXml();
+                    options = LoadFromXml();
+                    if (options.Apartments == null || options.Apartments.Count==0)
+                    {
+                        options.Apartments = DefaultApartments();
+                    }
+                    //else
+                    //{
+                        // Сортировка квартир по хронологическому номеру
+                        //options.SortApartments();
+                    //}
                 }
                 catch (Exception ex)
                 {
@@ -94,30 +119,28 @@ namespace PIK_AR_Acad.Interior.Typology
                 }
             }
             // Загрузка начтроек чертежа
-            options.LoadFromNOD();
+            options.LoadFromNOD();            
 
             return options;
         }
 
+        
+
         private void SetDefault ()
-        {            
-            //ApartmentsChronology = new AcadLib.UI.Properties.XmlSerializableDictionary<string>();
-            //foreach (var item in ApartmentBlock.DictNameChronologyDefault)
-            //{
-            //    ApartmentsChronology.Add(item.Key, item.Value);
-            //}            
+        {                     
+            Apartments = DefaultApartments();
         }
 
         private static Options LoadFromXml ()
         {
-            AcadLib.Files.SerializerXml ser = new AcadLib.Files.SerializerXml(FileXml);
+            var ser = new AcadLib.Files.SerializerXml(FileXml);
             return ser.DeserializeXmlFile<Options>();
         }
 
         public void Save ()
         {
             SaveToNOD();
-            AcadLib.Files.SerializerXml ser = new AcadLib.Files.SerializerXml(FileXml);
+            var ser = new AcadLib.Files.SerializerXml(FileXml);
             ser.SerializeList(this);
         }
 
@@ -133,5 +156,25 @@ namespace PIK_AR_Acad.Interior.Typology
             var sortColInt = nod.Load(RecSortColumn, 0);
             SortColumn = (SortColumnEnum)sortColInt;
         }
-    }
+
+        private static XmlSerializableDictionary<string> DefaultApartments()
+        {
+            var aparts = new XmlSerializableDictionary<string>(); 
+            foreach (var item in ApartmentBlock.DictNameChronologyDefault)
+            {
+                aparts.Add(item.Key, item.Value);
+            }
+            return aparts;
+        }
+
+        private void SortApartments()
+        {            
+            var sortAparts = Apartments.OrderBy(o=> o.Value, AcadLib.Comparers.AlphanumComparator.New).ToList();
+            Apartments = new XmlSerializableDictionary<string>();
+            foreach (var item in sortAparts)
+            {
+                Apartments.Add(item.Key, item.Value);
+            }
+        }
+    }   
 }
