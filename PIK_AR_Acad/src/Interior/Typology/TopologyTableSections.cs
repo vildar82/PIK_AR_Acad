@@ -77,7 +77,8 @@ namespace PIK_AR_Acad.Interior.Typology
                 foreach (var item in scheme.Sections)
                 {
                     item.TableRowIndex = rowSec;
-                    col[rowSec++, 1].TextString = $"{item.Name}\n({item.NumberFloors}эт.)";
+                    var tesxtFloors = item.NumberFloors == 0 ? "":  $"\n({item.NumberFloors}эт.)";
+                    col[rowSec++, 1].TextString =  $"{item.Name}{tesxtFloors}";
                 }
                 mCells = CellRange.Create(table, 6, 0, rowSec - 1, 0);
                 table.MergeCells(mCells);

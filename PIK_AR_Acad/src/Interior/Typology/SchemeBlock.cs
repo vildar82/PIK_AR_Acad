@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,11 +18,11 @@ namespace PIK_AR_Acad.Interior.Typology
         public string Name { get; set; }
         public List<Section> Sections { get; set; } = new List<Section>();
 
-        public SchemeBlock (BlockReference blRef, string blName) : base(blRef, blName)
+        public SchemeBlock (BlockReference blRef, string blName, string schemeName = null) : base(blRef, blName)
         {
             if (blRef == null)
             {
-                Name = "Неопределенная схема";
+                Name = schemeName ?? "Неопределенная схема";
                 return;
             }
             defineSections(blRef);
@@ -57,7 +58,9 @@ namespace PIK_AR_Acad.Interior.Typology
                     var text = (DBText)ent;
                     if (text.TextString.StartsWith("%%U"))
                     {
-                        Name = text.TextString.Replace("%%U", "");
+                        Name = text.TextString.Replace("%%U", "");                        
+                        Inspector.AddError($"Схема типологии - '{Name}'", GetEntityExtentsInModel(text), 
+                            Matrix3d.Identity,SystemIcons.Information);
                     }
                     else if(text.TextString.Contains("Секция", StringComparison.OrdinalIgnoreCase))
                     {
@@ -86,9 +89,9 @@ namespace PIK_AR_Acad.Interior.Typology
                 var textSec = findNearest(ptItem, textSections);
                 if (textSec == null)
                 {
-                    Inspector.AddError($"Не определено имя секции в схеме.", item.IdPlOrigin, item.Bounds, 
-                        System.Drawing.SystemIcons.Warning);
-                    item.Fail = true;
+                    Inspector.AddError($"Не определена секция в схеме.", item.IdPlOrigin, Transform, 
+                        SystemIcons.Error);
+                    //item.Fail = true;
                 }
                 else
                 {
@@ -99,9 +102,9 @@ namespace PIK_AR_Acad.Interior.Typology
                 var textFloor = findNearest(ptItem, textFloors);
                 if (textFloor == null)
                 {
-                    Inspector.AddError($"Не определена этажность секции в схеме.", item.IdPlOrigin, item.Bounds, 
-                        System.Drawing.SystemIcons.Warning);
-                    item.Fail = true;
+                    Inspector.AddError($"Не определена этажность секции в схеме.", item.Bounds, Matrix3d.Identity, 
+                        SystemIcons.Error);
+                    //item.Fail = true;
                 }
                 else
                 {
@@ -126,10 +129,22 @@ namespace PIK_AR_Acad.Interior.Typology
             }
         }
 
+        private Extents3d GetEntityExtentsInModel(Entity ent)
+        {
+            try
+            {
+                var ext = ent.GeometricExtents;
+                ext.TransformBy(Transform);
+                return ext;
+            }
+            catch { }
+            return ExtentsToShow;
+        }
+
         private DBText findNearest (Point3d ptItem, List<DBText> textSections)
         {
-            var res = textSections.OrderBy(o => (ptItem - o.Position).Length).FirstOrDefault();
-            return res;
+            var res = textSections.Select(s=>new { text = s, len = (ptItem - s.Position).Length }).OrderBy(o => o.len).FirstOrDefault();            
+            return res?.len < 20000 ? res.text : null;
         }
 
         public static bool IsSchemeBlock (string blName)

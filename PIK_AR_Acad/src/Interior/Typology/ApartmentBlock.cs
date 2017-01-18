@@ -9,6 +9,7 @@ using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using AcadLib.Geometry;
 using Autodesk.AutoCAD.Geometry;
+using NetLib;
 
 namespace PIK_AR_Acad.Interior.Typology
 {
@@ -105,7 +106,7 @@ namespace PIK_AR_Acad.Interior.Typology
             using (var t = db.TransactionManager.StartTransaction())
             {
                 // Переименование блоков PIK1
-                RenameOldblocksApartmentsPIK1ToNewFlat(db, t);
+                //RenameOldblocksApartmentsPIK1ToNewFlat(db, t);
 
                 foreach (var item in sel)
                 {
@@ -116,7 +117,8 @@ namespace PIK_AR_Acad.Interior.Typology
 
                     if (IsApartmentBlock(blName))
                     {
-                        var apartment = new ApartmentBlock(blRef, blName);                        
+                        var apartment = new ApartmentBlock(blRef, blName);
+                        apartment.CheckName();
                         if (apartment.Error != null)
                         {
                             Inspector.AddError(apartment.Error);
@@ -130,7 +132,7 @@ namespace PIK_AR_Acad.Interior.Typology
                     }
                     else
                     {
-                        Inspector.AddError($"Пропущен блок '{blName}'", blRef, System.Drawing.SystemIcons.Warning);
+                        //Inspector.AddError($"Пропущен блок '{blName}'", blRef, System.Drawing.SystemIcons.Warning);
                     }
                 }
 
@@ -140,6 +142,14 @@ namespace PIK_AR_Acad.Interior.Typology
                 t.Commit();
             }
             return apartments;
+        }
+
+        private void CheckName()
+        {
+            if (Name.HasCyrilic())
+            {
+                Inspector.AddError($"В имени блока квартиры есть русские буквы - '{Name}'");
+            }
         }
 
         private static void RenameOldblocksApartmentsPIK1ToNewFlat (Database db, Transaction t)
@@ -166,7 +176,7 @@ namespace PIK_AR_Acad.Interior.Typology
                 string help = "Схема дома - блок, имя начинается с 'Схема_'. В блоке схемы: однострочный текст начинающийся с подчеркивания - имя схемы. " + 
                      "Секция - полилиния с толщиной >=30, рядом с которой однострочные тексты 'Секция #' и '# этажей'.";
                 Inspector.AddError($"Не определен блок схемы.\n" + help , System.Drawing.SystemIcons.Error);
-                scheme = new SchemeBlock(null, null);                
+                scheme = new SchemeBlock(null, null, scheme.Name);                
             }
             else if (scheme.Sections.Count == 0)
             {
@@ -199,7 +209,7 @@ namespace PIK_AR_Acad.Interior.Typology
             {
                 scheme.Sections.Add(secNull);
                 var apartsSecNull = apartments.Where(s => s.Section == secNull);
-                Extents3d extSecNull = new Extents3d();
+                var extSecNull = new Extents3d();
                 foreach (var item in apartsSecNull)
                 {
                     extSecNull.AddExtents(item.Bounds.Value);
