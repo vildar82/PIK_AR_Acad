@@ -174,9 +174,9 @@ namespace PIK_AR_Acad.Interior.Typology
             if (scheme == null || scheme.Sections == null)
             {
                 string help = "Схема дома - блок, имя начинается с 'Схема_'. В блоке схемы: однострочный текст начинающийся с подчеркивания - имя схемы. " + 
-                     "Секция - полилиния с толщиной >=30, рядом с которой однострочные тексты 'Секция #' и '# этажей'.";
-                Inspector.AddError($"Не определен блок схемы.\n" + help , System.Drawing.SystemIcons.Error);
-                scheme = new SchemeBlock(null, null, scheme.Name);                
+                     "Секция - полилиния с толщиной >=30, рядом с которой однострочные тексты 'Секция #' и '# этажей'. См. пример блока схемы в палитре.";
+                Inspector.AddError($"Нет наименования объекта (блока схемы):\n" + help , System.Drawing.SystemIcons.Error);
+                scheme = new SchemeBlock(null, null, scheme?.Name);                
             }
             else if (scheme.Sections.Count == 0)
             {

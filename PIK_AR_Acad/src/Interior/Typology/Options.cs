@@ -93,11 +93,11 @@ namespace PIK_AR_Acad.Interior.Typology
                     {
                         options.Apartments = DefaultApartments();
                     }
-                    //else
-                    //{
-                        // Сортировка квартир по хронологическому номеру
-                        //options.SortApartments();
-                    //}
+                    else
+                    {
+                        //Сортировка квартир
+                        options.SortApartments();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -168,7 +168,7 @@ namespace PIK_AR_Acad.Interior.Typology
 
         private void SortApartments()
         {            
-            var sortAparts = Apartments.OrderBy(o=> o.Value, AcadLib.Comparers.AlphanumComparator.New).ToList();
+            var sortAparts = Apartments.OrderBy(o=> o.Key, AcadLib.Comparers.AlphanumComparator.New).ToList();
             Apartments = new XmlSerializableDictionary<string>();
             foreach (var item in sortAparts)
             {
