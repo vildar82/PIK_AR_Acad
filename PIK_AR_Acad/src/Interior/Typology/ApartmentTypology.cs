@@ -8,6 +8,7 @@ using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
+using AcadLib.Tables;
 
 namespace PIK_AR_Acad.Interior.Typology
 {
@@ -16,6 +17,13 @@ namespace PIK_AR_Acad.Interior.Typology
     /// </summary>
     public class ApartmentTypology
     {
+        private const string modePIK1 = "PIK1";
+        private const string modeChronology = "Chronology";
+        private const string modeSection = "Section";
+        private const string modeSU = "SU";
+        private const string modeOptions = "Options";
+        //private static string modeCurrent = "PIK1";
+
         public Document Doc { get; set; }
         public Database Db { get; set; }
         public Editor Ed { get; set; }
@@ -36,7 +44,91 @@ namespace PIK_AR_Acad.Interior.Typology
             Ed = doc.Editor;
         }
 
-        public void CreateTableTypology ()
+        public void Start()
+        {            
+            // Выбор режима работы: PIK1, Crhronology, По секциям, СУ, Настройки
+            var prOpt = new PromptKeywordOptions("");
+            prOpt.Keywords.Add(modePIK1, "ПИК1");
+            prOpt.Keywords.Add(modeChronology, "Хронология");
+            prOpt.Keywords.Add(modeSection, "ПоСекциям");
+            //prOpt.Keywords.Add(modeSU, "СУ");
+            prOpt.Keywords.Add(modeOptions, "Настроки");
+            //try
+            //{
+            //    prOpt.Keywords.Default = modeCurrent;
+            //}
+            //catch { }
+            var prRes = Ed.GetKeywords(prOpt);
+            if (prRes.Status != PromptStatus.OK)
+            {
+                return;
+            }
+            //modeCurrent = prRes.StringResult;
+            switch (prRes.StringResult)
+            {
+                case modePIK1:
+                    Options.Instance.SortColumn = SortColumnEnum.PIK1;
+                    CreateApartTable();
+                    break;
+                case modeChronology:
+                    Options.Instance.SortColumn = SortColumnEnum.Chronology;
+                    CreateApartTable();
+                    break;
+                case modeSection:
+                    CreateSectionTable();
+                    break;
+                case modeOptions:
+                    Options.PromptOptions();
+                    break;                
+            }
+        }
+
+        private void CreateApartTable()
+        {            
+            SchemeBlock scheme;
+            var  groupApartments = GetApartments(out scheme);
+            CreateTable(new TopologyTable(groupApartments, scheme, Db));            
+        }
+
+        private void CreateSectionTable()
+        {
+            SchemeBlock scheme;
+            var groupApartments = GetApartments(out scheme);
+            CreateTable(new TopologyTableSections(groupApartments, scheme, Db));
+        }
+
+        private void CreateTable(ICreateTable itable)
+        {
+            itable.CalcRows();
+            var table = itable.Create();
+            itable.Insert(table, Doc);
+        }
+
+        private List<IGrouping<ApartmentBlock, ApartmentBlock>> GetApartments(out SchemeBlock scheme)
+        {            
+            // Слои для квартир
+            DefineApartmentLayers();
+
+            var sel = Select();
+            // Определение квартир
+            var apartments = ApartmentBlock.GetApartments(sel, out scheme);
+            Ed.WriteMessage($"\nОпределено блков квартир - {apartments.Count}");
+
+            // группировка квартир
+            List<IGrouping<ApartmentBlock, ApartmentBlock>>  groupApartments = null;
+            if (Options.Instance.SortColumn == SortColumnEnum.PIK1)
+            {
+                groupApartments = apartments.GroupBy(g => g).OrderBy(o => o.Key.Type).ThenBy(o => o.Key).ToList();
+            }
+            else if (Options.Instance.SortColumn == SortColumnEnum.Chronology)
+            {
+                groupApartments = apartments.GroupBy(g => g).
+                    OrderBy(o => o.Key.NameChronology, AcadLib.Comparers.AlphanumComparator.New).ToList();
+            }
+            return groupApartments;
+        }
+
+        private void CreateTableTypology ()
         {
             var sel = Select();
 
@@ -119,10 +211,10 @@ namespace PIK_AR_Acad.Interior.Typology
         {
             var selOpt = new PromptSelectionOptions();
             
-            selOpt.Keywords.Add("Options");
-            var keys = selOpt.Keywords.GetDisplayString(true);
-            selOpt.MessageForAdding = "\nВыбор блоков: " + keys;
-            selOpt.KeywordInput += SelOpt_KeywordInput;
+            //selOpt.Keywords.Add("Options");
+            //var keys = selOpt.Keywords.GetDisplayString(true);
+            selOpt.MessageForAdding = "\nВыбор блоков: ";// + keys;
+            //selOpt.KeywordInput += SelOpt_KeywordInput;
             var selRes = Ed.GetSelection(selOpt);
 
             if (selRes.Status!= PromptStatus.OK)

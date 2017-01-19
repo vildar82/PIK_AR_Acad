@@ -27,6 +27,7 @@ namespace PIK_AR_Acad.Interior.Typology
         //[XmlIgnore]
         //public AcadLib.UI.Properties.XmlSerializableDictionary<string> ApartmentsChronology { get; set; }        
 
+        [Browsable(false)]
         [Category("Сортировка")]
         [DisplayName("По столбцу")]
         [Description("Выбор столбца для сотрировки квартир в таблице.")]
@@ -122,9 +123,7 @@ namespace PIK_AR_Acad.Interior.Typology
             options.LoadFromNOD();            
 
             return options;
-        }
-
-        
+        }       
 
         private void SetDefault ()
         {                     
@@ -144,17 +143,17 @@ namespace PIK_AR_Acad.Interior.Typology
             ser.SerializeList(this);
         }
 
-        private void SaveToNOD ()
+        public void SaveToNOD ()
         {
-            var nod = new DictNOD(DictNod, true);
-            nod.Save((int)this.SortColumn, RecSortColumn);            
+            //var nod = new DictNOD(DictNod, true);
+            //nod.Save((int)this.SortColumn, RecSortColumn);            
         }
 
         private void LoadFromNOD ()
         {
-            var nod = new DictNOD(DictNod, true);
-            var sortColInt = nod.Load(RecSortColumn, 0);
-            SortColumn = (SortColumnEnum)sortColInt;
+            //var nod = new DictNOD(DictNod, true);
+            //var sortColInt = nod.Load(RecSortColumn, 0);
+            //SortColumn = (SortColumnEnum)sortColInt;
         }
 
         private static XmlSerializableDictionary<string> DefaultApartments()

@@ -65,7 +65,18 @@ namespace PIK_AR_Acad.Interior.Typology
 
             mCells = CellRange.Create(table, 5, 0, 5, 1);
             table.MergeCells(mCells);
-            col[5, 0].TextString = "Схема";
+            string textScheme;
+            if (scheme.Sections.Count == 1 && scheme.Sections[0].IsTower)
+            {
+                var f = scheme.Sections[0].NumberFloors;
+                string textFloors = f == 0 ? "" : $", {f} этажей";
+                textScheme = $"Схема (Башня{textFloors})";
+            }
+            else
+            {
+                textScheme = "Схема";
+            }
+            col[5, 0].TextString = textScheme;
 
             col = columns[1];            
             col.Width = 60;
@@ -121,9 +132,9 @@ namespace PIK_AR_Acad.Interior.Typology
 
         protected override void FillCells (Table table)
         {
-            var cs = db.CurrentSpaceId.GetObject(OpenMode.ForWrite) as BlockTableRecord;
-            cs.AppendEntity(table);
-            db.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(table, true);
+            //var cs = db.CurrentSpaceId.GetObject(OpenMode.ForWrite) as BlockTableRecord;
+            //cs.AppendEntity(table);
+            //db.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(table, true);
 
             table.Cells.TextHeight = 8;
             table.Rows[0].TextHeight = 12;

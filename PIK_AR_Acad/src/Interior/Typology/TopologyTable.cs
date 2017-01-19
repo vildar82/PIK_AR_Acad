@@ -70,9 +70,9 @@ namespace PIK_AR_Acad.Interior.Typology
 
         protected override void FillCells (Table table)
         {
-            var cs = db.CurrentSpaceId.GetObject(OpenMode.ForWrite) as BlockTableRecord;
-            cs.AppendEntity(table);
-            db.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(table, true);            
+            //var cs = db.CurrentSpaceId.GetObject(OpenMode.ForWrite) as BlockTableRecord;
+            //cs.AppendEntity(table);
+            //db.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(table, true);            
 
             table.Rows[0].Height = 36;
             table.Rows[1].Height = 30;

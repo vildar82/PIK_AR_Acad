@@ -28,16 +28,16 @@ namespace PIK_AR_Acad.Interior.Typology
             defineSections(blRef);
         }
 
-        private void defineSections (BlockReference blRef)
+        private void defineSections(BlockReference blRef)
         {
-            var btr = blRef.BlockTableRecord.GetObject( OpenMode.ForRead) as BlockTableRecord;
+            var btr = blRef.BlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord;
 
             List<DBText> textSections = new List<DBText>();
             List<DBText> textFloors = new List<DBText>();
 
             foreach (var idEnt in btr)
             {
-                var ent = idEnt.GetObject( OpenMode.ForRead);
+                var ent = idEnt.GetObject(OpenMode.ForRead);
                 if (ent is Polyline)
                 {
                     var pl = (Polyline)ent;
@@ -58,11 +58,15 @@ namespace PIK_AR_Acad.Interior.Typology
                     var text = (DBText)ent;
                     if (text.TextString.StartsWith("%%U"))
                     {
-                        Name = text.TextString.Replace("%%U", "");                        
-                        Inspector.AddError($"Схема типологии - '{Name}'", GetEntityExtentsInModel(text), 
-                            Matrix3d.Identity,SystemIcons.Information);
+                        Name = text.TextString.Replace("%%U", "");
+                        Inspector.AddError($"Схема типологии - '{Name}'", GetEntityExtentsInModel(text),
+                            Matrix3d.Identity, SystemIcons.Information);
                     }
-                    else if(text.TextString.Contains("Секция", StringComparison.OrdinalIgnoreCase))
+                    else if (text.TextString.Contains("Секция", StringComparison.OrdinalIgnoreCase))
+                    {
+                        textSections.Add(text);
+                    }
+                    else if (text.TextString.Contains("Башня", StringComparison.OrdinalIgnoreCase))
                     {
                         textSections.Add(text);
                     }
@@ -89,46 +93,46 @@ namespace PIK_AR_Acad.Interior.Typology
                 var textSec = findNearest(ptItem, textSections);
                 if (textSec == null)
                 {
-                    Inspector.AddError($"Не определена секция в схеме.", item.IdPlOrigin, Transform, 
+                    Inspector.AddError($"Не определена секция в схеме.", item.IdPlOrigin, Transform,
                         SystemIcons.Error);
                     //item.Fail = true;
                 }
                 else
                 {
                     item.Name = textSec.TextString;
-                    textSections.Remove(textSec);                    
+                    textSections.Remove(textSec);
                 }
 
                 var textFloor = findNearest(ptItem, textFloors);
                 if (textFloor == null)
                 {
-                    Inspector.AddError($"Не определена этажность секции в схеме.", item.Bounds, Matrix3d.Identity, 
+                    Inspector.AddError($"Не определена этажность секции в схеме.", item.Bounds, Matrix3d.Identity,
                         SystemIcons.Error);
                     //item.Fail = true;
                 }
                 else
                 {
                     item.SetFloors(textFloor.TextString);
-                    textFloors.Remove(textFloor);                    
+                    textFloors.Remove(textFloor);
                 }
             }
-            if (Sections.Any(s => s.Fail))
+            Sections.RemoveAll(s => s.Fail);
+            if (Sections.Any(s=>s.IsTower) && Sections.Count>1)
             {
-                Sections = null;
+                var tower = Sections.FirstOrDefault(s=>s.IsTower);
+                Inspector.AddError($"В схеме есть Башня и другие секции. Башня должна быть одна в схеме!", 
+                    tower.Bounds, Matrix3d.Identity, SystemIcons.Error);
             }
-            else
+            foreach (var item in Sections)
             {
-                foreach (var item in Sections)
+                if (!string.IsNullOrEmpty(item.Name) && item.NumberFloors != 0)
                 {
-                    if (!string.IsNullOrEmpty(item.Name) && item.NumberFloors != 0)
-                    {
-                        Inspector.AddError($"{item.Name}, {item.NumberFloors} этажная", item.Bounds, item.IdPlOrigin,
-                            System.Drawing.SystemIcons.Information);
-                    }
+                    Inspector.AddError($"{item.Name}, {item.NumberFloors} этажная", item.Bounds, item.IdPlOrigin,
+                        System.Drawing.SystemIcons.Information);
                 }
             }
         }
-
+    
         private Extents3d GetEntityExtentsInModel(Entity ent)
         {
             try

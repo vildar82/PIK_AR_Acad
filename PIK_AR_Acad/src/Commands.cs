@@ -19,7 +19,7 @@ namespace PIK_AR_Acad
             AcadLib.CommandStart.Start(doc =>
             {
                 var topologyApartmets = new Interior.Typology.ApartmentTypology (doc);
-                topologyApartmets.CreateTableTypology();
+                topologyApartmets.Start();
             });
         }
     }

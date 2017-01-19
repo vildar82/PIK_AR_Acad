@@ -15,10 +15,13 @@ namespace PIK_AR_Acad.Interior.Typology
         public int NumberFloors { get; set; }
         public double Area { get; set; }
         public Point3d Center { get; set; }
-        public string Name { get; set; } = string.Empty;
+        public string Name { get { return name ?? "";}
+            set { name = value; IsTower = value?.Contains("Башня", StringComparison.OrdinalIgnoreCase) ?? false; } }
+        string name;
         public Extents3d Bounds { get; set; }
         public int TableRowIndex { get; internal set; }
         public bool Fail { get; internal set; }
+        public bool IsTower { get; private set; }
 
         public Section(Polyline plContour, ObjectId idPlOrigin)
         {
