@@ -52,7 +52,7 @@ namespace PIK_AR_Acad.Interior.Typology
             prOpt.Keywords.Add(modeChronology, "Хронология");
             prOpt.Keywords.Add(modeSection, "ПоСекциям");
             //prOpt.Keywords.Add(modeSU, "СУ");
-            prOpt.Keywords.Add(modeOptions, "Настроки");
+            prOpt.Keywords.Add(modeOptions, "Настройки");
             prOpt.Keywords.Default = modePIK1;
             //try
             //{

@@ -11,15 +11,24 @@ using Autodesk.AutoCAD.ApplicationServices;
 using System.Collections;
 using AcadLib.UI.Properties;
 using System.Drawing.Design;
+using AcadLib.XData;
+using Autodesk.AutoCAD.DatabaseServices;
 
 namespace PIK_AR_Acad.Interior.Typology
 {
+    public enum SortApartment
+    {
+        Имя,
+        Хронология
+    }
+
     [Serializable]
-    public class Options
+    public class Options : ITypedDataValues, IExtDataSave
     {
         static string FileXml = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\Interior\AI_ApartmentsTypology.xml");
         const string DictNod = "AI_ApartmentsTypology";
         const string RecSortColumn = "SortColumn";
+        const string RecSortApart = "SortApart";
 
         //[Category("Общие")]
         //[DisplayName("Хронологические марки квартир")]
@@ -27,11 +36,18 @@ namespace PIK_AR_Acad.Interior.Typology
         //[XmlIgnore]
         //public AcadLib.UI.Properties.XmlSerializableDictionary<string> ApartmentsChronology { get; set; }        
 
+        [XmlIgnore]
         [Browsable(false)]
         [Category("Сортировка")]
         [DisplayName("По столбцу")]
         [Description("Выбор столбца для сотрировки квартир в таблице.")]
         public SortColumnEnum SortColumn { get; set; } = SortColumnEnum.PIK1;
+
+        [Category("Квартиры")]
+        [DisplayName("Сортировка коллекции")]
+        [Description("Сортировка квартир в редактрое.")]
+        public SortApartment SortApartment { get { return sortApartment; } set { sortApartment = value; SortApartments(); } }
+        SortApartment sortApartment = SortApartment.Имя;
 
         [Category("Квартиры")]
         [DisplayName("Квартиры")]
@@ -145,15 +161,15 @@ namespace PIK_AR_Acad.Interior.Typology
 
         public void SaveToNOD ()
         {
-            //var nod = new DictNOD(DictNod, true);
-            //nod.Save((int)this.SortColumn, RecSortColumn);            
+            var nod = new DictNOD("AR", true);            
+            nod.Save(GetExtDic(null));           
         }
 
         private void LoadFromNOD ()
         {
-            //var nod = new DictNOD(DictNod, true);
-            //var sortColInt = nod.Load(RecSortColumn, 0);
-            //SortColumn = (SortColumnEnum)sortColInt;
+            var nod = new DictNOD("AR", true);
+            var dic = nod.LoadED(DictNod);
+            SetExtDic(dic, null);            
         }
 
         private static XmlSerializableDictionary<string> DefaultApartments()
@@ -168,12 +184,46 @@ namespace PIK_AR_Acad.Interior.Typology
 
         private void SortApartments()
         {            
-            var sortAparts = Apartments.OrderBy(o=> o.Key, AcadLib.Comparers.AlphanumComparator.New).ToList();
+            var sortAparts = Apartments.OrderBy(a => a.Key.Substring(0,a.Key.IndexOf('_')))
+                .ThenBy(o =>
+                {
+                    if (SortApartment == SortApartment.Имя)
+                        return o.Key;
+                    else
+                        return o.Value;
+                }, AcadLib.Comparers.AlphanumComparator.New);
+
+            //var sortAparts = Apartments.OrderBy(o=> o.Key, AcadLib.Comparers.AlphanumComparator.New).ToList();
             Apartments = new XmlSerializableDictionary<string>();
             foreach (var item in sortAparts)
             {
                 Apartments.Add(item.Key, item.Value);
             }
+        }
+
+        public List<TypedValue> GetDataValues(Document doc)
+        {
+            var tvs = new TypedValueExtKit();
+            tvs.Add("SortApartment", SortApartment);
+            return tvs.Values;            
+        }
+
+        public void SetDataValues(List<TypedValue> values, Document doc)
+        {            
+            var dictValues = values.ToDictionary();
+            SortApartment = dictValues.GetValue("SortApartment", SortApartment.Имя);
+        }
+
+        public DicED GetExtDic(Document doc)
+        {
+            var dic = new DicED(DictNod);
+            dic.AddRec("OptionsRec", GetDataValues(null));
+            return dic;
+        }
+
+        public void SetExtDic(DicED dicEd, Document doc)
+        {
+            SetDataValues(dicEd?.GetRec(DictNod)?.Values, doc);
         }
     }   
 }

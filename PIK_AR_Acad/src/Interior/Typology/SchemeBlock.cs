@@ -59,7 +59,7 @@ namespace PIK_AR_Acad.Interior.Typology
                     if (text.TextString.StartsWith("%%U"))
                     {
                         Name = text.TextString.Replace("%%U", "");
-                        Inspector.AddError($"Схема типологии - '{Name}'", GetEntityExtentsInModel(text),
+                        Inspector.AddError($"Имя объекта - '{Name}'", GetEntityExtentsInModel(text),
                             Matrix3d.Identity, SystemIcons.Information);
                     }
                     else if (text.TextString.Contains("Секция", StringComparison.OrdinalIgnoreCase))
@@ -148,7 +148,7 @@ namespace PIK_AR_Acad.Interior.Typology
         private DBText findNearest (Point3d ptItem, List<DBText> textSections)
         {
             var res = textSections.Select(s=>new { text = s, len = (ptItem - s.Position).Length }).OrderBy(o => o.len).FirstOrDefault();            
-            return res?.len < 20000 ? res.text : null;
+            return res?.len < 30000 ? res.text : null;
         }
 
         public static bool IsSchemeBlock (string blName)
