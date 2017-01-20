@@ -42,13 +42,7 @@ namespace PIK_AR_Acad.Interior.Typology
         [Category("Сортировка")]
         [DisplayName("По столбцу")]
         [Description("Выбор столбца для сотрировки квартир в таблице.")]
-        public SortColumnEnum SortColumn { get; set; } = SortColumnEnum.PIK1;
-
-        [Category("Квартиры")]
-        [DisplayName("Сортировка коллекции")]
-        [Description("Сортировка квартир в редактрое.")]
-        public SortApartment SortApartment { get { return sortApartment; } set { sortApartment = value; SortApartments(); } }
-        SortApartment sortApartment = SortApartment.Имя;
+        public SortColumnEnum SortColumn { get; set; } = SortColumnEnum.PIK1;        
 
         [Category("Квартиры")]
         [DisplayName("Квартиры")]
@@ -58,7 +52,14 @@ namespace PIK_AR_Acad.Interior.Typology
         [AcadLib.UI.Designer.GenericDictionaryEditor(Title ="Редактор хронологических имен квартир",
             KeyDisplayName = "Квартира", ValueDisplayName = "Хронологическое имя")]
         public XmlSerializableDictionary <string> Apartments { get; set; }
-                
+
+        [Category("Квартиры")]
+        [DisplayName("Сортировка коллекции")]
+        [Description("Сортировка квартир в редактрое.")]
+        public SortApartment SortApartment { get { return sortApartment; } set { sortApartment = value; SortApartments(); } }
+        SortApartment sortApartment = SortApartment.Имя;
+
+
         private static Options _instance;
         public static Options Instance {
             get {
