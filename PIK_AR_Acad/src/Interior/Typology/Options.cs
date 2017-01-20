@@ -13,6 +13,7 @@ using AcadLib.UI.Properties;
 using System.Drawing.Design;
 using AcadLib.XData;
 using Autodesk.AutoCAD.DatabaseServices;
+using AcadLib.Errors;
 
 namespace PIK_AR_Acad.Interior.Typology
 {
@@ -117,7 +118,9 @@ namespace PIK_AR_Acad.Interior.Typology
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log.Error(ex, $"Ошибка при попытке загрузки настроек таблицы из XML файла {FileXml}");
+                    var errMsg = $"Ошибка при попытке загрузки настроек таблицы из XML файла '{FileXml}'. {ex.Message}";
+                    Logger.Log.Error(ex, errMsg);
+                    Inspector.AddError(errMsg);
                 }
             }
             if (options == null)
@@ -125,18 +128,18 @@ namespace PIK_AR_Acad.Interior.Typology
                 // Создать дефолтные
                 options = new Options();
                 options.SetDefault();
-                // Сохранение дефолтных настроек 
-                try
-                {
-                    options.Save();
-                }
-                catch (Exception exSave)
-                {
-                    Logger.Log.Error(exSave, $"Попытка сохранение настроек в файл {FileXml}");
-                }
+                //// Сохранение дефолтных настроек 
+                //try
+                //{
+                //    options.Save();
+                //}
+                //catch (Exception exSave)
+                //{
+                //    Logger.Log.Error(exSave, $"Попытка сохранение настроек в файл {FileXml}");
+                //}
             }
             // Загрузка начтроек чертежа
-            options.LoadFromNOD();            
+            //options.LoadFromNOD();            
 
             return options;
         }       
@@ -154,7 +157,7 @@ namespace PIK_AR_Acad.Interior.Typology
 
         public void Save ()
         {
-            SaveToNOD();
+            //SaveToNOD();
             var ser = new AcadLib.Files.SerializerXml(FileXml);
             ser.SerializeList(this);
         }
@@ -183,7 +186,8 @@ namespace PIK_AR_Acad.Interior.Typology
         }
 
         private void SortApartments()
-        {            
+        {
+            if (Apartments == null) return;
             var sortAparts = Apartments.OrderBy(a => a.Key.Substring(0,a.Key.IndexOf('_')))
                 .ThenBy(o =>
                 {
