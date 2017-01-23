@@ -106,7 +106,7 @@ namespace PIK_AR_Acad.Interior.Typology
             using (var t = db.TransactionManager.StartTransaction())
             {
                 // Переименование блоков PIK1
-                //RenameOldblocksApartmentsPIK1ToNewFlat(db, t);
+                RenameOldblocksApartmentsPIK1ToNewFlat(db, t);
 
                 foreach (var item in sel)
                 {
