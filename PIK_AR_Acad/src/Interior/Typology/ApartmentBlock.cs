@@ -213,8 +213,14 @@ namespace PIK_AR_Acad.Interior.Typology
                 foreach (var item in apartsSecNull)
                 {
                     extSecNull.AddExtents(item.Bounds.Value);
-                }                
-                Inspector.AddError($"Неопределенная секция", extSecNull, Matrix3d.Identity, System.Drawing.SystemIcons.Error);
+                }
+                string errSection = "Для распределения всех квартир одного объекта по секциям (в горизонтальной таблице)," + 
+                                    "необходимо в блоке объекта каждую секцию/башню обвести полилинией (по осям) толщиной >=30, " +
+                                    "рядом с которой разместить однострочные тексты 'Секция #' либо 'Башня'. " +
+                                    "Также можно еще добавить рядом с полилинией однострочный текст '# этажей' – " + 
+                                    "показывает количество этажей каждой секции/башни. " +
+                                    "См.пример блока схемы в палитре Интерьеры.";
+                Inspector.AddError($"Неопределенная секция. {errSection}", extSecNull, Matrix3d.Identity, System.Drawing.SystemIcons.Error);
             }
         }
 
@@ -236,18 +242,14 @@ namespace PIK_AR_Acad.Interior.Typology
         {
             if (other == null) return false;
             if (ReferenceEquals(this, other)) return true;
-
-            var res = Name == other.Name;
-            return res;
+            return Name == other.Name;            
         }
 
         public int CompareTo (ApartmentBlock other)
         {
             if (other == null) return 1;
             if (ReferenceEquals(this, other)) return 0;
-
-            var res = AcadLib.Comparers.AlphanumComparator.New.Compare(Name, other.Name);
-            return res;
+            return AcadLib.Comparers.AlphanumComparator.New.Compare(Name, other.Name);            
         }
 
         public override int GetHashCode ()

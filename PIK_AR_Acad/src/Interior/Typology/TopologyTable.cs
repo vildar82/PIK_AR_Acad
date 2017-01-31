@@ -7,6 +7,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using AcadLib;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Geometry;
+using AcadLib.Errors;
 
 namespace PIK_AR_Acad.Interior.Typology
 {
@@ -150,7 +151,7 @@ namespace PIK_AR_Acad.Interior.Typology
                     cell.TextString = apart.Key.Name;
 
                     cell = table.Cells[row, 4];
-                    cell.BlockTableRecordId = apart.Key.IdBtr;
+                    cell.BlockTableRecordId = GetApartCellBtr(apart);
                     var blockContent = cell.Contents[0];
                     blockContent.IsAutoScale = false;
                     blockContent.Scale = (1 / scale) * 0.4;
@@ -193,7 +194,7 @@ namespace PIK_AR_Acad.Interior.Typology
                     cell.TextString = apart.Key.Name;
 
                     cell = table.Cells[row, 4];
-                    cell.BlockTableRecordId = apart.Key.IdBtr;
+                    cell.BlockTableRecordId = GetApartCellBtr(apart);
                     var blockContent = cell.Contents[0];
                     blockContent.IsAutoScale = false;
                     blockContent.Scale = (1 / scale) * 0.4;
@@ -204,6 +205,27 @@ namespace PIK_AR_Acad.Interior.Typology
 
                     row++;
                 }
+            }
+        }
+
+        private ObjectId GetApartCellBtr(IGrouping<ApartmentBlock, ApartmentBlock> apart)
+        {
+            // Если все блоки одинаковые, то берем блок, как в них, если нет, то дефолтный блок квартиры            
+            if (apart.All(a=>a.IdBtrAnonym==apart.Key.IdBtrAnonym))
+            {
+                // Если они все не динамические
+                if (apart.Key.IdBtrAnonym == ObjectId.Null)
+                    return apart.Key.IdBtr;
+                else
+                    return apart.Key.IdBtrAnonym;
+                            
+            }
+            else
+            {
+                // Разные динамические блоки одной квартиры - предупреждение
+                Inspector.AddError($"Разные динамические блоки квартиры в схеме '{apart.Key.Name}'",
+                    apart.Key.IdBlRef, System.Drawing.SystemIcons.Exclamation);
+                return apart.Key.IdBtr;
             }
         }
 

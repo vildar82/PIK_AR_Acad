@@ -91,6 +91,9 @@ namespace PIK_AR_Acad.Interior.Typology
             CreateTable(new TopologyTable(groupApartments, scheme, Db));            
         }
 
+        /// <summary>
+        /// Горизонтальная таблица - по секциям
+        /// </summary>
         private void CreateSectionTable()
         {
             SchemeBlock scheme;
@@ -127,55 +130,7 @@ namespace PIK_AR_Acad.Interior.Typology
                     OrderBy(o => o.Key.NameChronology, AcadLib.Comparers.AlphanumComparator.New).ToList();
             }
             return groupApartments;
-        }
-
-        private void CreateTableTypology ()
-        {
-            var sel = Select();
-
-            // Слои для квартир
-            DefineApartmentLayers();
-
-            // Определение квартир
-            SchemeBlock scheme;
-            var apartments = ApartmentBlock.GetApartments(sel, out scheme);
-            Ed.WriteMessage($"\nОпределено блков квартир - {apartments.Count}");
-
-            // группировка квартир
-            List<IGrouping<ApartmentBlock, ApartmentBlock>> groupApartments = null;
-            if (Options.Instance.SortColumn == SortColumnEnum.PIK1)
-            {
-                groupApartments = apartments.GroupBy(g => g).OrderBy(o => o.Key.Type).ThenBy(o => o.Key).ToList();
-            }
-            else if (Options.Instance.SortColumn == SortColumnEnum.Chronology)
-            {
-                groupApartments = apartments.GroupBy(g => g).
-                    OrderBy(o => o.Key.NameChronology, AcadLib.Comparers.AlphanumComparator.New).ToList();
-            }
-
-            using (var t = Db.TransactionManager.StartTransaction())
-            {
-                var tableService = new TopologyTable(groupApartments, scheme, Db);
-                tableService.CalcRows();
-                var table = tableService.Create();
-                var scale = AcadLib.Scale.ScaleHelper.GetCurrentAnnoScale(Db);
-                table.TransformBy(Matrix3d.Scaling(scale, table.Position));
-
-                var tableServiceSections = new TopologyTableSections(groupApartments, scheme, Db);
-                tableServiceSections.CalcRows();
-                var tableSec = tableServiceSections.Create();
-                tableSec.Position = new Point3d(table.Position.X, table.Position.Y - table.Height - 10 * scale, 0);
-                tableSec.TransformBy(Matrix3d.Scaling(scale, tableSec.Position));
-
-                ObjectId[] ids = new ObjectId[2];
-                ids[0] = table.Id;
-                ids[1] = tableSec.Id;
-
-                AcadLib.Jigs.DragSel.Drag(Doc.Editor, ids, Point3d.Origin);
-
-                t.Commit();
-            }            
-        }
+        }        
 
         private void DefineApartmentLayers ()
         {
@@ -227,11 +182,6 @@ namespace PIK_AR_Acad.Interior.Typology
                         
             Ed.WriteMessage($"\nВыбрано блоков - {selIds.Length}");
             return selIds;
-        }
-
-        private void SelOpt_KeywordInput (object sender, SelectionTextInputEventArgs e)
-        {
-            Options.PromptOptions();
-        }
+        }       
     }
 }
