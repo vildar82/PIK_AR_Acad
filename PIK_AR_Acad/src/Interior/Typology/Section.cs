@@ -22,6 +22,7 @@ namespace PIK_AR_Acad.Interior.Typology
         public int TableRowIndex { get; internal set; }
         public bool Fail { get; internal set; }
         public bool IsTower { get; private set; }
+        public bool IsHightFloors { get; internal set; }
 
         public Section(Polyline plContour, ObjectId idPlOrigin)
         {
@@ -38,6 +39,10 @@ namespace PIK_AR_Acad.Interior.Typology
         public void SetFloors (string textString)
         {
             NumberFloors = AcadLib.Regexes.RegexExt.StartInt(textString);
+            if (NumberFloors >=18)
+            {
+                IsHightFloors = true;
+            }
         }
     }
 }

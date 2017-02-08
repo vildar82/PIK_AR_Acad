@@ -12,6 +12,7 @@ namespace PIK_AR_Acad.Interior.Typology
     public class TopologyTableSections : AcadLib.Tables.CreateTable
     {
         Color badColor = Color.FromColorIndex( ColorMethod.ByAci, 1);
+        Color towerBackground = Color.FromRgb(247,133,2);
         int rowNumberPP = 1;
         int rowType = 2;
         int rowMarkPik1 = 3;
@@ -57,7 +58,7 @@ namespace PIK_AR_Acad.Interior.Typology
 
             mCells = CellRange.Create(table, 3, 0, 3, 1);
             table.MergeCells(mCells);
-            col[3, 0].TextString = "Марка";
+            col[3, 0].TextString = "Марка";            
 
             mCells = CellRange.Create(table, 4, 0, 4, 1);
             table.MergeCells(mCells);
@@ -89,20 +90,30 @@ namespace PIK_AR_Acad.Interior.Typology
                 {
                     item.TableRowIndex = rowSec;
                     var tesxtFloors = item.NumberFloors == 0 ? "":  $"\n({item.NumberFloors}эт.)";
-                    col[rowSec++, 1].TextString =  $"{item.Name}{tesxtFloors}";
+                    cell = col[rowSec++, 1];
+                    cell.TextString =  $"{item.Name}{tesxtFloors}";
+                    cell.TextHeight = 6;      
+                    if (item.IsHightFloors)
+                    {
+                        cell.BackgroundColor = towerBackground;
+                    }
                 }
                 mCells = CellRange.Create(table, 6, 0, rowSec - 1, 0);
                 table.MergeCells(mCells);
                 cell = table.Cells[6, 0];
                 cell.TextString = "Кол-во квартир по секциям на этаже, шт.";
-                cell.Contents[0].Rotation = 90.0.ToRadians();
+                cell.TextHeight = 6; // Высота текста 600
+                cell.Contents[0].Rotation = 90.0.ToRadians();                
             }
 
             col = columns[0];
             rowCountInFloor = rowSec;
             mCells = CellRange.Create(table, rowCountInFloor, 0, rowCountInFloor, 1);
             table.MergeCells(mCells);
-            col[rowCountInFloor, 0].TextString = "Кол-во на этаже";
+            cell = col[rowCountInFloor, 0];
+            cell.TextString = "Кол-во на этаже";
+            cell.Borders.Top.LineStyle = GridLineStyle.Double;
+            cell.Borders.Top.DoubleLineSpacing = 1.5;
             rowTotalInFloorByType = rowCountInFloor + 1;
             mCells = CellRange.Create(table, rowTotalInFloorByType, 0, rowTotalInFloorByType, 1);
             table.MergeCells(mCells);
@@ -139,6 +150,9 @@ namespace PIK_AR_Acad.Interior.Typology
             table.Cells.TextHeight = 8;
             table.Rows[0].TextHeight = 12;
 
+            table.Rows[rowMarkPik1].Height = 30;
+            table.Rows[rowScheme].Height = 110;
+            
             Cell cell;
             CellRange mCells;
             var groupApartments = apartments.GroupBy(g => g.Key.Type).OrderBy(o=>o.Key);
@@ -163,6 +177,7 @@ namespace PIK_AR_Acad.Interior.Typology
 
                     cell = table.Cells[rowMarkPik1, curCol];
                     cell.TextString = apart.Key.Name;
+                    cell.TextHeight = 7.5;
 
                     cell = table.Cells[rowMarkChrono, curCol];
                     cell.TextString = apart.Key.NameChronology;
@@ -181,12 +196,20 @@ namespace PIK_AR_Acad.Interior.Typology
                         {
                             cell = table.Cells[item.TableRowIndex, curCol];
                             cell.TextString = "-";
+                            if (item.IsHightFloors)
+                            {
+                                cell.BackgroundColor = towerBackground;
+                            }
                         }
                                                 
                         foreach (var item in groupBySec)
                         {
                             cell = table.Cells[item.Key.TableRowIndex, curCol];
                             cell.TextString = item.Count().ToString();
+                            if (item.Key.IsHightFloors)
+                            {
+                                cell.BackgroundColor = towerBackground;
+                            }
                         }
                     }
 
@@ -203,6 +226,11 @@ namespace PIK_AR_Acad.Interior.Typology
             }
             // Объединение одинаковых хронологических марок
             MergeChronoCells(table);
+
+            // Двойная линия над Кол-во на этаже
+            var rowCountInFloorObj = table.Rows[rowCountInFloor];
+            rowCountInFloorObj.Borders.Top.LineStyle = GridLineStyle.Double;
+            rowCountInFloorObj.Borders.Top.DoubleLineSpacing = 150;
         }
 
         private void MergeChronoCells (Table table)
