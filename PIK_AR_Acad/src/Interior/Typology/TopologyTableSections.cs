@@ -41,7 +41,9 @@ namespace PIK_AR_Acad.Interior.Typology
         {
             Cell cell;
             var col = columns[0];
-            var table = col.ParentTable;           
+            var table = col.ParentTable;
+
+            table.Cells.TextHeight = 8;
 
             table.SetRowHeight(27);
             table.SetColumnWidth(65);
@@ -132,6 +134,10 @@ namespace PIK_AR_Acad.Interior.Typology
             {
                 cell = table.Cells[item.Key.TableRowIndex, colLast];
                 cell.TextString = item.Count().ToString();
+                if (item.Key.IsHightFloors)
+                {
+                    cell.BackgroundColor = towerBackground;
+                }
             }
 
             // всего квартир
@@ -147,7 +153,7 @@ namespace PIK_AR_Acad.Interior.Typology
             //cs.AppendEntity(table);
             //db.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(table, true);
 
-            table.Cells.TextHeight = 8;
+            //table.Cells.TextHeight = 8;
             table.Rows[0].TextHeight = 12;
 
             table.Rows[rowMarkPik1].Height = 30;
@@ -174,10 +180,10 @@ namespace PIK_AR_Acad.Interior.Typology
                 {
                     cell = table.Cells[rowNumberPP, curCol];
                     cell.TextString = (curCol - 1).ToString();
-
+                    
                     cell = table.Cells[rowMarkPik1, curCol];
-                    cell.TextString = apart.Key.Name;
-                    cell.TextHeight = 7.5;
+                    cell.TextString = $"{{\\fIsocpeur|b1;{apart.Key.Name}}}";// apart.Key.Name; // cell.TextString =  $"{{\\fIsocpeur|b1;\\L{cell.TextString}}}";            
+                    cell.TextHeight = 7.5;                          
 
                     cell = table.Cells[rowMarkChrono, curCol];
                     cell.TextString = apart.Key.NameChronology;
